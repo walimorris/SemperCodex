@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.TextField?>
+<?import java.net.URL?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smart.peepingbill.controllers.PeepingBillController">
+    <stylesheets>
+        <URL value="@peepingStyles.css" />
+    </stylesheets>
+    <padding>
+        <Insets bottom="20.0"/>
+    </padding>
+    <BorderPane>
+        <top>
+            <BorderPane styleClass="topHeader">
+                <left>
+                    <Label fx:id="headerText" text="Peeping B!ll"/>
+                </left>
+                <center>
+                    <ImageView
+                            fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                        <Image fx:id="peepingBillImage" url="@peeping_bill_main.jpeg"/>
+                    </ImageView>
+                </center>
+                <right>
+                    <Button fx:id="helpButton" text="Help"/>
+                </right>
+            </BorderPane>
+        </top>
+    </BorderPane>
+    <VBox alignment="TOP_CENTER" spacing="20.0">
+        <padding>
+            <Insets top="80.0"/>
+        </padding>
+        <TextField fx:id="user" promptText="User Name" minWidth="100.0" maxWidth="400.0"/>
+        <PasswordField fx:id="password" promptText="Password" minWidth="100.0" maxWidth="400.0"/>
+        <Button fx:id="loginButton" text="Login" onAction="#onLoginButtonSubmit"/>
+        <Button fx:id="newUserButton" text="New User" onAction="#onUserCreateSubmit"/>
+    </VBox>
+</VBox>

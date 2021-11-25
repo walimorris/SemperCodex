@@ -1,0 +1,60 @@
+.topHeader {
+    -fx-padding: 10px;
+    -fx-font-size: 20px;
+    -fx-background-color: teal;
+}
+
+#headerText {
+    -fx-text-fill: #ffffff;
+    -fx-padding: 10px;
+}
+
+#user {
+    -fx-padding: 10px;
+}
+
+#password {
+    -fx-padding: 10px;
+}
+
+#createUserName {
+    -fx-padding: 10px;
+}
+
+#createUserPassword {
+    -fx-padding: 10px;
+}
+
+#confirmPassword {
+    -fx-padding: 10px;
+}
+
+#helpButton {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+#loginButton {
+    -fx-background-color: #a2b9bc;
+}
+
+#newUserButton {
+    -fx-background-color: #a2b9bc;
+}
+
+#createUserButton {
+    -fx-background-color: #a2b9bc;
+}
+
+#backButton {
+    -fx-background-color: #a2b9bc;
+}
+
+#peepingBillImage {
+    -fx-min-height: 20%;
+    -fx-max-height: 20%;
+    -fx-min-width: 20%;
+    -fx-max-width: 20%;
+}
