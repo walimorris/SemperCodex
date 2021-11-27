@@ -1,15 +1,11 @@
 package com.smart.peepingbill.models.impl;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Defines the POJO used for CRUD operations on database for {@link com.smart.peepingbill.PeepingBillApplication}
  */
 public class User {
-    private static final Logger LOG = LoggerFactory.getLogger(User.class);
-
     private ObjectId id;
     private String user;
     private String password;

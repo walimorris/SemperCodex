@@ -42,7 +42,7 @@ public class PeepingBillApplication extends Application {
             stage.show();
             LOG.info("PeepingBillApplication Login scene applied");
         } catch (IOException e) {
-            LOG.error("Error creating Primary Stage Scene from PeepingBillApplication Login: " + e.getLocalizedMessage());
+            LOG.error("Error creating Primary Stage Scene from {} Login Page {}: ", PeepingBillApplication.class, e.getLocalizedMessage());
         }
     }
 

@@ -56,7 +56,9 @@ public class CreateUserController {
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
-                LOG.error("Thread interruption error during pause after new user creation: " + e.getMessage());
+                LOG.error("Thread interruption error during pause after new user creation: {}", e.getMessage());
+                // restore interrupted state
+                Thread.currentThread().interrupt();
             }
             loadLoginPage();
         } else {

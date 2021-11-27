@@ -101,29 +101,36 @@ public class PasswordImpl implements Password {
             if (value.equals(Boolean.FALSE)) {
                 switch(property) {
                     case PeepingConstants.HAS_SPECIAL_CHARACTERS:
-                        if (StringUtils.isNotEmpty(passwordValidationMessage)) {
-                            passwordValidationMessage.append(PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_1);
-                        } else {
-                            passwordValidationMessage.append(PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_2);
-                        }
+                        passwordValidationMessage.append(appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_1,
+                                PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_2));
                         break;
                     case PeepingConstants.HAS_NUMBER:
-                        if (StringUtils.isNotEmpty(passwordValidationMessage)) {
-                            passwordValidationMessage.append(PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_1);
-                        } else
-                            passwordValidationMessage.append(PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_2);
+                        passwordValidationMessage.append(appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_1,
+                                PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_2));
                         break;
                     default:
-                        if (StringUtils.isNotEmpty(passwordValidationMessage)) {
-                            passwordValidationMessage.append(PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_1);
-                        } else {
-                            passwordValidationMessage.append(PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_2);
-                        }
+                        passwordValidationMessage.append(appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_1,
+                                PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_2));
                         break;
                 }
             }
         });
+        LOG.info("Invalid Password creation message created ' {} '", passwordValidationMessage);
         return StringUtils.isNotEmpty(passwordValidationMessage) ? passwordValidationMessage.toString()
                 : PeepingConstants.SUCCESS;
+    }
+
+    /**
+     * Password validation message helper. Helps build password validation message.
+     * @param validationMessage current validation message
+     * @param message1 possible message to append to current validation message.
+     * @param message2 possible message to append to current validation message.
+     * @return {@link String} possible message appended to current validation message.
+     */
+    private String appendToValidationMessage(StringBuilder validationMessage, String message1, String message2 ) {
+        validationMessage.append(StringUtils.isNotEmpty(validationMessage) ?
+                validationMessage.append(message1) : validationMessage.append(message2));
+
+        return validationMessage.toString();
     }
 }

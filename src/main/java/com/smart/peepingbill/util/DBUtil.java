@@ -15,8 +15,11 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.Reader;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -57,9 +60,9 @@ public class DBUtil {
             mongoClient = MongoClients.create(clientSettings);
             database = mongoClient.getDatabase(PeepingConstants.USER_DATBASE).withCodecRegistry(pojoCodecRegistry);
             userCollection = database.getCollection(PeepingConstants.USER_COLLECTION, User.class);
-            LOG.info("DatabaseConnection_Connected to database '" + database.getName() + "'");
+            LOG.info("DatabaseConnection_Connected to database ' {} '", database.getName());
         } catch (MongoClientException e) {
-            LOG.error("DatabaseConnection_Unable to connect to database '" + database.getName() + "' :" + e.getMessage());
+            LOG.error("DatabaseConnection_Unable to connect to database ' {} ' : {}", database.getName(), e.getMessage());
         }
     }
 
@@ -78,10 +81,10 @@ public class DBUtil {
                 try {
                     userCollection.insertOne(user);
                     message.append(PeepingConstants.SUCCESS);
-                    LOG.info("UserCreation_user_created '" + user.getUserName() + "' : " + PeepingConstants.SUCCESS);
+                    LOG.info("UserCreation_user_created ' {} ' : {}", user.getUserName(), PeepingConstants.SUCCESS);
                     return message.toString();
                 } catch (MongoClientException e) {
-                    LOG.info("Error connecting to database and creating user '" + user.getUserName() + "': " + e.getMessage());
+                    LOG.info("Error connecting to database and creating user ' {} ' : {}", user.getUserName(), e.getMessage());
                 }
             }
             LOG.info("UserCreation_user_unavailable for creation : action unavailable");
@@ -112,7 +115,7 @@ public class DBUtil {
             // user has been found - follow up with password match
             success = StringUtils.equals(findUser.getPassword(), user.getPassword()) ? PeepingConstants.TRUE
                     : PeepingConstants.INVALID_PASSWORD_ENTRY;
-            LOG.info("LOGIN SUCCESS MESSAGE:" + success);
+            LOG.info("LOGIN SUCCESS MESSAGE: ' {} '", success);
         }
         return success;
     }
@@ -130,15 +133,20 @@ public class DBUtil {
      * Loads application properties for mongo database connection and setup.
      */
     private void loadSmartDatabaseConnectionString() {
-        try {
-            Properties properties = new Properties();
-            Path propertyFile = Path.of(String.valueOf(Paths.get(PeepingConstants.APPLICATION_PROPERTIES)));
-            properties.load(Files.newBufferedReader(propertyFile));
-            properties.getProperty(PeepingConstants.MONGO_CONNECTION_STRING);
-            this.connectionString = new ConnectionString(properties.getProperty(PeepingConstants.MONGO_CONNECTION_STRING));
-        } catch (IOException e) {
-            LOG.error("Unable to build Mongo Database connection string from application properties file");
-            System.exit(1);
+        Properties properties = new Properties();
+        StringBuilder propertyFileStr = new StringBuilder();
+
+        // Run with Try With resources design as Reader and BufferedReader will auto-close.
+        try (Reader propertyFile = new FileReader(String.valueOf(Path.of(String.valueOf(Paths.get(PeepingConstants.APPLICATION_PROPERTIES)))));
+            BufferedReader applicationPropertyReader = new BufferedReader(propertyFile)) {
+
+                // build property file string
+                propertyFileStr.append(propertyFile);
+                properties.load(applicationPropertyReader);
+                properties.getProperty(PeepingConstants.MONGO_CONNECTION_STRING);
+                this.connectionString = new ConnectionString(properties.getProperty(PeepingConstants.MONGO_CONNECTION_STRING));
+        } catch (InvalidPathException | IOException e) {
+            LOG.error("Error loading given path ' {} '", propertyFileStr);
         }
     }
 }

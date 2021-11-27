@@ -7,7 +7,11 @@ import org.apache.commons.lang3.StringUtils;
  * Class used to receive reason for various actions on {@link com.smart.peepingbill.PeepingBillApplication}.
  */
 public class ReasonUtil {
-    private static Reason reason;
+
+    // Disallows instantiation of ReasonUtil
+    private ReasonUtil(){
+        throw new IllegalStateException(String.format("Illegal access to Utility class ' %s '", ReasonUtil.class));
+    }
 
     /**
      * Creates a User Login {@link Reason}.
@@ -32,14 +36,14 @@ public class ReasonUtil {
      * before processing a login.
      */
     public static class Reason {
-        private final String reason;
+        private final String whichReason;
 
         /**
          * Private constructor for outer class {@link ReasonUtil}.
          * @param reason {@link String}
          */
         private Reason(String reason) {
-            this.reason = reason;
+            this.whichReason = reason;
         }
 
         /**
@@ -47,7 +51,7 @@ public class ReasonUtil {
          * @return boolean
          */
         public boolean isLoginUserReason() {
-            return StringUtils.equals(this.reason, PeepingConstants.LOGIN_USER);
+            return StringUtils.equals(this.whichReason, PeepingConstants.LOGIN_USER);
         }
 
         /**
@@ -55,12 +59,12 @@ public class ReasonUtil {
          * @return boolean
          */
         public boolean isCreateUserReason() {
-            return StringUtils.equals(this.reason, PeepingConstants.CREATE_USER);
+            return StringUtils.equals(this.whichReason, PeepingConstants.CREATE_USER);
         }
 
         @Override
         public String toString() {
-            return this.reason;
+            return this.whichReason;
         }
     }
 }

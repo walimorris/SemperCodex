@@ -49,7 +49,7 @@ public class PeepingBillController {
 
     @FXML
     protected void onLoginButtonSubmit() {
-        LOG.info("LoginProcess_login_activated: processing for user '" + user.getText() + "'");
+        LOG.info("LoginProcess_login_activated: processing for user ' {} '", user.getText());
         password.setText(password.getText());
         user.setText(user.getText());
         if (StringUtils.isNotEmpty(password.getText()) && StringUtils.isNotEmpty(user.getText())) {
@@ -57,7 +57,7 @@ public class PeepingBillController {
             DBUtil dbUtil = new DBUtil();
             dbUtil.usersDatabaseConnect();
             String success = dbUtil.findUser(currentUser, ReasonUtil.getLoginUserReason());
-            LOG.info("LoginProcess_login_processed_message: " + success);
+            LOG.info("LoginProcess_login_processed_message: ' {} '", success);
             dbUtil.userDataBaseClose();
             resetLoginCredentials();
         }
@@ -74,7 +74,7 @@ public class PeepingBillController {
 
     @FXML
     protected void onUserCreateSubmit() {
-        LOG.info("CreateUserProcess_create_user_process_initiated");
+        LOG.info("{}", "CreateUserProcess_create_user_process_initiated");
         try {
             Stage stage = PeepingBillApplication.getPrimaryStage();
             FXMLLoader fxmlLoader = new FXMLLoader(PeepingBillApplication.class.getResource(
@@ -85,7 +85,7 @@ public class PeepingBillController {
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
-            LOG.error("Error loading Create User Scene" + e.getMessage());
+            LOG.error("Error loading Create User Scene: {}", e.getMessage());
         }
     }
 }
