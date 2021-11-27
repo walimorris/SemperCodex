@@ -58,7 +58,7 @@ public class DBUtil {
                     .codecRegistry(pojoCodecRegistry)
                     .build();
             mongoClient = MongoClients.create(clientSettings);
-            database = mongoClient.getDatabase(PeepingConstants.USER_DATBASE).withCodecRegistry(pojoCodecRegistry);
+            database = mongoClient.getDatabase(PeepingConstants.USER_DATABASE).withCodecRegistry(pojoCodecRegistry);
             userCollection = database.getCollection(PeepingConstants.USER_COLLECTION, User.class);
             LOG.info("DatabaseConnection_Connected to database ' {} '", database.getName());
         } catch (MongoClientException e) {

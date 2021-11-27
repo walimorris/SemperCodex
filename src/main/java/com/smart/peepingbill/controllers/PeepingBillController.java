@@ -42,6 +42,9 @@ public class PeepingBillController {
     private Button newUserButton;
 
     @FXML
+    private Label loginMessage;
+
+    @FXML
     private Button helpButton;
 
     @FXML
@@ -60,6 +63,8 @@ public class PeepingBillController {
             LOG.info("LoginProcess_login_processed_message: ' {} '", success);
             dbUtil.userDataBaseClose();
             resetLoginCredentials();
+        } else {
+            renderEmptyUserCredentialMessage();
         }
         resetLoginCredentials();
     }
@@ -70,6 +75,20 @@ public class PeepingBillController {
     private void resetLoginCredentials() {
         password.setText(PeepingConstants.EMPTY_STRING);
         user.setText(PeepingConstants.EMPTY_STRING);
+    }
+
+    /**
+     * Renders login message for invalid user login credentials such as empty user name,
+     * empty password or both.
+     */
+    private void renderEmptyUserCredentialMessage() {
+        if (StringUtils.isEmpty(user.getText()) && StringUtils.isEmpty(password.getText())) {
+            loginMessage.setText("*User credentials are empty");
+        } else if (StringUtils.isEmpty(user.getText())) {
+            loginMessage.setText("*User credential empty");
+        } else {
+            loginMessage.setText("*Password credential empty");
+        }
     }
 
     @FXML

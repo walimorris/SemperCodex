@@ -45,5 +45,6 @@
         <PasswordField fx:id="password" promptText="Password" minWidth="100.0" maxWidth="400.0"/>
         <Button fx:id="loginButton" text="Login" onAction="#onLoginButtonSubmit"/>
         <Button fx:id="newUserButton" text="New User" onAction="#onUserCreateSubmit"/>
+        <Label fx:id="loginMessage"/>
     </VBox>
 </VBox>

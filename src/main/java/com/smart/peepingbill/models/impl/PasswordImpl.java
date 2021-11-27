@@ -18,6 +18,8 @@ public class PasswordImpl implements Password {
 
     private String password;
 
+    public PasswordImpl() {}
+
     public PasswordImpl(String password) {
         this.password = password;
     }
@@ -101,16 +103,16 @@ public class PasswordImpl implements Password {
             if (value.equals(Boolean.FALSE)) {
                 switch(property) {
                     case PeepingConstants.HAS_SPECIAL_CHARACTERS:
-                        passwordValidationMessage.append(appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_1,
-                                PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_2));
+                        appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_1,
+                                PeepingConstants.MISSING_VALID_SPECIAL_CHARACTER_MESSAGE_2);
                         break;
                     case PeepingConstants.HAS_NUMBER:
-                        passwordValidationMessage.append(appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_1,
-                                PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_2));
+                        appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_1,
+                                PeepingConstants.MISSING_NUMERIC_VALUE_MESSAGE_2);
                         break;
                     default:
-                        passwordValidationMessage.append(appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_1,
-                                PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_2));
+                        appendToValidationMessage(passwordValidationMessage, PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_1,
+                                PeepingConstants.MISSING_UPPERCASE_CHARACTER_MESSAGE_2);
                         break;
                 }
             }
@@ -128,9 +130,11 @@ public class PasswordImpl implements Password {
      * @return {@link String} possible message appended to current validation message.
      */
     private String appendToValidationMessage(StringBuilder validationMessage, String message1, String message2 ) {
-        validationMessage.append(StringUtils.isNotEmpty(validationMessage) ?
-                validationMessage.append(message1) : validationMessage.append(message2));
-
+        if (StringUtils.isNotEmpty(validationMessage)) {
+            validationMessage.append(message1);
+        } else {
+            validationMessage.append(message2);
+        }
         return validationMessage.toString();
     }
 }

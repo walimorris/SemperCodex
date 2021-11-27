@@ -40,6 +40,10 @@
     -fx-background-color: #a2b9bc;
 }
 
+#loginMessage {
+    -fx-text-fill: #ff0000 ;
+}
+
 #newUserButton {
     -fx-background-color: #a2b9bc;
 }
