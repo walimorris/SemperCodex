@@ -29,16 +29,28 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
- * Defines the code for database operations on the {@link com.smart.peepingbill.PeepingBillApplication}
+ * Defines the code for database operations on the {@link com.smart.peepingbill.PeepingBillApplication}.
+ * DBUtil utilizes the Singleton Pattern to ensure a single instance of DBUtil is accessible for a
+ * single purpose.
  */
 public class DBUtil {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
 
+    private static DBUtil instance;
     private ConnectionString connectionString;
-
     private MongoCollection<User> userCollection;
     private MongoClient mongoClient;
     private MongoDatabase database;
+
+    private DBUtil() {}
+
+    public static DBUtil getInstance() {
+        if (instance == null) {
+            instance = new DBUtil();
+            return instance;
+        }
+        return instance;
+    }
 
     /**
      * Connects to smart Database.
@@ -77,7 +89,9 @@ public class DBUtil {
         StringBuilder message = new StringBuilder();
         if (StringUtils.isNotEmpty(user.getUserName()) && StringUtils.isNotEmpty(user.getPassword())) {
             isUserExist = findUser(user, reason);
-            if (isUserExist.equals(PeepingConstants.TRUE)) {
+
+            // case: user creation options: returns true if user found and false otherwise
+            if (isUserExist.equals(PeepingConstants.FALSE)) {
                 try {
                     userCollection.insertOne(user);
                     message.append(PeepingConstants.SUCCESS);
@@ -100,24 +114,27 @@ public class DBUtil {
      * @return boolean
      */
     public String findUser(User user, ReasonUtil.Reason reason) {
-        String success = PeepingConstants.FALSE;
+        String message = PeepingConstants.FALSE;
         User findUser = userCollection.find(Filters.eq("userName", user.getUserName())).first();
+        LOG.info("Searching for user ' {} ' in ' {} ' database", user.getUserName(), database.getName());
 
         // find user for user creation process
         if (reason.isCreateUserReason() && findUser != null) {
-            return success;
-        } else if (reason.isCreateUserReason() && findUser == null) {
-            return PeepingConstants.SUCCESS;
+            return PeepingConstants.TRUE;
+        } else {
+            if (reason.isCreateUserReason() && findUser == null) {
+                return message;
+            }
         }
 
         // find user for user login process
         if (reason.isLoginUserReason() && findUser != null) {
             // user has been found - follow up with password match
-            success = StringUtils.equals(findUser.getPassword(), user.getPassword()) ? PeepingConstants.TRUE
+            message = StringUtils.equals(findUser.getPassword(), user.getPassword()) ? PeepingConstants.TRUE
                     : PeepingConstants.INVALID_PASSWORD_ENTRY;
-            LOG.info("LOGIN SUCCESS MESSAGE: ' {} '", success);
+            LOG.info("LOGIN SUCCESS MESSAGE: ' {} '", message);
         }
-        return success;
+        return message;
     }
 
     /**

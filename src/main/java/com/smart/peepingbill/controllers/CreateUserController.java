@@ -78,13 +78,13 @@ public class CreateUserController {
             if (StringUtils.equals(password.getText(), confirmPassword.getText())) {
                 if (isValidPassword().equals(PeepingConstants.SUCCESS)) {
                     User createdUser = new User(user.getText(), password.getText());
-                    DBUtil dbUtil = new DBUtil();
-                    dbUtil.usersDatabaseConnect();
-                    String createdUserResult = dbUtil.insertNewUser(createdUser,
+                    DBUtil.getInstance().usersDatabaseConnect();
+                    String createdUserResult = DBUtil.getInstance().insertNewUser(createdUser,
                             ReasonUtil.getCreateUserReason());
-
-                    destroyUserCreationProcess(dbUtil);
-                    return createdUserResult;
+                    DBUtil.getInstance().userDataBaseClose();
+                    resetPassword();
+                    return createdUserResult.equals(PeepingConstants.SUCCESS) ? PeepingConstants.SUCCESS :
+                            PeepingConstants.USER_UNAVAILABLE;
                 } else {
                     String message = isValidPassword();
                     resetDestroyPassword();
@@ -119,13 +119,9 @@ public class CreateUserController {
     }
 
     /**
-     * Destroys {@link DBUtil} database connection if it exits and resets password to null.
-     * @param dbUtil {@link DBUtil}
+     *
      */
-    private void destroyUserCreationProcess(DBUtil dbUtil) {
-        if (dbUtil != null) {
-            dbUtil.userDataBaseClose();
-        }
+    private void resetPassword() {
         createUserPassword.setText(null);
     }
 

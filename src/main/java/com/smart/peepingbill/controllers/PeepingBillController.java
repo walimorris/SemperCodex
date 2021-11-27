@@ -57,11 +57,10 @@ public class PeepingBillController {
         user.setText(user.getText());
         if (StringUtils.isNotEmpty(password.getText()) && StringUtils.isNotEmpty(user.getText())) {
             User currentUser = new User(user.getText(), password.getText());
-            DBUtil dbUtil = new DBUtil();
-            dbUtil.usersDatabaseConnect();
-            String success = dbUtil.findUser(currentUser, ReasonUtil.getLoginUserReason());
+            DBUtil.getInstance().usersDatabaseConnect();
+            String success = DBUtil.getInstance().findUser(currentUser, ReasonUtil.getLoginUserReason());
             LOG.info("LoginProcess_login_processed_message: ' {} '", success);
-            dbUtil.userDataBaseClose();
+            DBUtil.getInstance().userDataBaseClose();
             resetLoginCredentials();
         } else {
             renderEmptyUserCredentialMessage();
