@@ -60,7 +60,7 @@ public class PeepingBillController {
             DBUtil.getInstance().usersDatabaseConnect();
             String success = DBUtil.getInstance().findUser(currentUser, ReasonUtil.getLoginUserReason());
             LOG.info("LoginProcess_login_processed_message: ' {} '", success);
-            DBUtil.getInstance().userDataBaseClose();
+            DBUtil.getInstance().close();
             resetLoginCredentials();
         } else {
             renderEmptyUserCredentialMessage();

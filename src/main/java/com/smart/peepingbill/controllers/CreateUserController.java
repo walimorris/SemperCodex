@@ -81,7 +81,7 @@ public class CreateUserController {
                     DBUtil.getInstance().usersDatabaseConnect();
                     String createdUserResult = DBUtil.getInstance().insertNewUser(createdUser,
                             ReasonUtil.getCreateUserReason());
-                    DBUtil.getInstance().userDataBaseClose();
+                    DBUtil.getInstance().close();
                     resetPassword();
                     return createdUserResult.equals(PeepingConstants.SUCCESS) ? PeepingConstants.SUCCESS :
                             PeepingConstants.USER_UNAVAILABLE;

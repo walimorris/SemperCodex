@@ -15,10 +15,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +30,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  * DBUtil utilizes the Singleton Pattern to ensure a single instance of DBUtil is accessible for a
  * single purpose.
  */
-public class DBUtil {
+public class DBUtil implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
 
     private static DBUtil instance;
@@ -140,9 +137,10 @@ public class DBUtil {
     /**
      * Close current {@link MongoClient} connected to open Smart database.
      */
-    public void userDataBaseClose() {
-        if (this.mongoClient != null) {
-            this.mongoClient.close();
+    @Override
+    public void close() {
+        if (mongoClient != null) {
+            mongoClient.close();
         }
     }
 
