@@ -41,6 +41,10 @@ public class DBUtil implements Closeable {
 
     private DBUtil() {}
 
+    /**
+     * Utilize Singleton pattern here as to only allow a single Database instance.
+     * @return {@link DBUtil} instance.
+     */
     public static DBUtil getInstance() {
         if (instance == null) {
             instance = new DBUtil();
