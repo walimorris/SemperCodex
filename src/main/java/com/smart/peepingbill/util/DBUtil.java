@@ -1,6 +1,8 @@
 package com.smart.peepingbill.util;
 
-import com.mongodb.*;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientException;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -15,7 +17,11 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.Reader;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +57,14 @@ public class DBUtil implements Closeable {
             return instance;
         }
         return instance;
+    }
+
+    /**
+     * Check for live instance of DBUtil. Returns true if live instance or null otherwise.
+     * @return boolean
+     */
+    public static boolean checkInstanceActive() {
+        return instance != null;
     }
 
     /**
@@ -145,6 +159,9 @@ public class DBUtil implements Closeable {
     public void close() {
         if (mongoClient != null) {
             mongoClient.close();
+            if (checkInstanceActive()) {
+                instance = null;
+            }
         }
     }
 
