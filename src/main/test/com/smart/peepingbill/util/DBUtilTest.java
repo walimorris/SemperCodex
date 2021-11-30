@@ -34,6 +34,7 @@ class DBUtilTest {
     }
 
     @AfterEach
+    // Database active, close.
     void tearDown() {
         DBUtil.getInstance().close();
     }
