@@ -21,9 +21,10 @@ steps:
       sonar.projectKey=semper-codex_codex
       sonar.projectName=codex
 
+- task: SonarCloudAnalyze@1
+
 - task: JavaToolInstaller@0
   inputs:
-- task: SonarCloudAnalyze@1
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
