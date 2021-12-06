@@ -12,6 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.1</junit.version>
+        <mongodb-driver-sync.version>4.4.0</mongodb-driver-sync.version>
     </properties>
 
     <dependencies>
@@ -101,10 +102,17 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Mongo db test containers -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mongodb</artifactId>
+            <version>1.16.2</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.0.5</version>
+            <version>${mongodb-driver-sync.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -132,6 +140,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.12.10</version>
         </dependency>
     </dependencies>
 

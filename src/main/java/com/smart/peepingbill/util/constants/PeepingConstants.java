@@ -26,6 +26,7 @@ public final class PeepingConstants {
     public static final String TEST_PASS_FAIL_2 = "testpassfail";
     public static final String TEST_PASS_SUCCESS_1 = "test$Password1";
     public static final String TEST_PASS_SUCCESS_2 = "!THIS2ShallPass";
+    public static final String TEST_USER_NAME_SUCCESS_1 = "testUserPass";
 
     // application path from content root
     public static final String APPLICATION_PROPERTIES = "src/main/resources/application.properties";
