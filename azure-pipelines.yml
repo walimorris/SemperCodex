@@ -9,18 +9,21 @@ pool:
 
 steps:
 
-- task: SonarQubePrepare@5
+- task: SonarQubePrepare@1
   inputs:
-    SonarQube: 'smartcodex sonarq connection'
+    SonarCloud: 'sonarcloudcodex'
+    organization: 'semper-codex'
     scannerMode: 'Other'
     extraProperties: |
       # Additional properties that will be passed to the scanner, 
       # Put one key=value per line, example:
       # sonar.exclusions=**/*.bin
-      sonar.projectKey=peepingbill_peepingbill
+      sonar.projectKey=semper-codex_codex
+      sonar.projectName=codex
 
 - task: JavaToolInstaller@0
   inputs:
+- task: SonarCloudAnalyze@1
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
