@@ -111,7 +111,7 @@ class DBUtilTest {
 
         userTestCollection = database.getCollection(USER_TEST_COLLECTION, User.class);
         User result = userTestCollection.find(Filters.eq("userName", testUser.getUserName())).first();
-        ReasonUtil.Reason reason = ReasonUtil.getCreateUserReason(); 
+        ReasonUtil.Reason reason = ReasonUtil.getCreateUserReason();
         String success = null; 
         
         // reason should be a 'create user' reason and null to insert new user

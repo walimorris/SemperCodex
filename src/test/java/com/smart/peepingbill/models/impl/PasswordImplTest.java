@@ -1,5 +1,6 @@
 package com.smart.peepingbill.models.impl;
 
+import com.smart.peepingbill.models.impl.PasswordImpl;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
