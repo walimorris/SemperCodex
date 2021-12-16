@@ -14,6 +14,18 @@ public interface HostLANMap {
     String getIpAddress();
 
     /**
+     * Get Host Name.
+     * @return {@link String}
+     */
+    String getHostname();
+
+    /**
+     * Get {@link Map} containing ipaddress and host name.
+     * @return {@link Map}
+     */
+    Map<String, String> getIpToHostMap();
+
+    /**
      * Get Addresses of all devices in host Local Area Network.
      * @return {@link Map} key: mac address value: ip address
      */

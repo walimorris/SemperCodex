@@ -1,6 +1,7 @@
 package com.smart.peepingbill.models.impl;
 
 import com.smart.peepingbill.models.HostLANMap;
+import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,13 +10,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,18 +21,29 @@ public class HostLANMapImpl implements HostLANMap {
     private static final Logger LOG = LoggerFactory.getLogger(HostLANMapImpl.class);
 
     private final String ipaddress;
+    private final String hostname;
     private final String secretKey;
+    private final Map<String, String> ipToHostMap;
 
     public HostLANMapImpl(String key) {
-        Map<String, String> map = buildHostIpMap();
-        this.ipaddress = getIpAddressWithoutHostName(map);
-        this.secretKey = key;
+        ipaddress = NetworkUtil.getIpaddress();
+        hostname = NetworkUtil.getHost();
+        ipToHostMap = Map.of(PeepingConstants.IP_ADDRESS, ipaddress,
+                PeepingConstants.HOST_NAME, hostname);
+
+        secretKey = key;
     }
 
     @Override
     public String getIpAddress() {
         return this.ipaddress;
     }
+
+    @Override
+    public String getHostname() { return this.hostname; }
+
+    @Override
+    public Map<String, String> getIpToHostMap() { return ipToHostMap; }
 
     @Override
     public Map<String, String> getLANMacAddresses() {
@@ -89,38 +98,6 @@ public class HostLANMapImpl implements HostLANMap {
             System.out.println("Could not process NMAP '-sn' command, " + e.getLocalizedMessage());
         }
         return pristine(macAddresses, getIPNetworkSegment(ipaddress));
-    }
-
-    private String getIpAddressWithoutHostName(Map<String, String> networkMap) {
-        String ipAddress = networkMap.get("ipAddress");
-        String hostName = networkMap.get("hostName");
-        StringBuilder ipAddressWithoutHostname = new StringBuilder();
-        return hostName != null ? ipAddressWithoutHostname.append(ipAddress, hostName.length() + 1, ipAddress.length()).toString() :
-                ipAddressWithoutHostname.append(ipAddress, 1, ipAddress.length()).toString();
-    }
-
-    private Map<String, String> buildHostIpMap() {
-        Map<String, String> hostIpMap = new HashMap<>();
-        Inet4Address ip = null;
-        String hostname = null;
-        try {
-            ip = (Inet4Address) Inet4Address.getLocalHost();
-            hostname = ip.getHostName();
-        } catch (UnknownHostException e) {
-            System.out.println("Host is unknown, can not get ip address or host name, " + e.getLocalizedMessage());
-            System.out.println("\nSmart System can't be monitored without knowledge of host ip address and LAN.");
-            System.exit(1);
-        }
-        hostname = hostname == null || hostname.isEmpty() ? "Unknown Host" : hostname;
-        hostIpMap.put("ipAddress", ip.toString());
-        hostIpMap.put("hostName", hostname);
-        return hostIpMap;
-    }
-
-    private StringBuilder getPassword() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Password: ");
-        return new StringBuilder().append(scanner.nextLine());
     }
 
     private String extractMacAddress(String line) {

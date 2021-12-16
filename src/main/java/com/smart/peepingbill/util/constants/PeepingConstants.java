@@ -29,6 +29,7 @@ public final class PeepingConstants {
     public static final String CITY = "city";
     public static final String ZIP = "zip";
     public static final String ISP = "isp";
+    public static final String SUBMIT = "submit";
     public static final String MOBILE = "mobile";
     public static final String PROXY = "proxy";
     public static final String HOSTING = "hosting";
@@ -80,6 +81,7 @@ public final class PeepingConstants {
     public static final String GATEWAY = "_gateway";
     public static final String HOST = "host";
     public static final String HOST_NAME = "hostName";
+    public static final String IP_ADDRESS = "ipAddress";
     public static final String LOCAL_IP_ADDRESS = "localIpAddress";
     public static final String EXTERNAL_IP_ADDRESS = "externalIpAddress";
     public static final String MAC_LOOKUP_API_URL = "https://api.macaddress.io/v1?apiKey=";
