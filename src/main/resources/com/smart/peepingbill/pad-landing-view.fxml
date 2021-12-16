@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import java.net.URL?>
+<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.smart.peepingbill.controllers.PadLandingController">
+    <stylesheets>
+        <URL value="@peepingStyles.css" />
+    </stylesheets>
+    <padding>
+        <Insets bottom="20.0"/>
+    </padding>
+    <VBox fx:id="padLandingVBox">
+        <TextField fx:id="addresses" text="Peeping B!ll"/>
+        <Button fx:id="buildNetworkButton" text="Build" onAction="#onBuildNetworkButtonClick"/>
+        <Circle fx:id="hostBoxNode"/>
+    </VBox>
+</VBox>

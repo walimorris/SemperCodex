@@ -1,7 +1,7 @@
 package com.smart.peepingbill.models;
 
 /**
- * Defines the code for {@link com.smart.peepingbill.models.impl.PasswordImpl} class.
+ * Defines the interface for {@link com.smart.peepingbill.models.impl.PasswordImpl} class.
  */
 public interface Password {
 

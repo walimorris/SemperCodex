@@ -26,6 +26,9 @@ import java.io.IOException;
 public class PeepingBillController {
     private static final Logger LOG = LoggerFactory.getLogger(PeepingBillController.class);
 
+    private static final String FALSE = "false";
+    private static final String TRUE = "true";
+
     @FXML
     private TextField user;
 
@@ -52,16 +55,17 @@ public class PeepingBillController {
 
     @FXML
     protected void onLoginButtonSubmit() {
-        LOG.info("LoginProcess_login_activated: processing for user ' {} '", user.getText());
+        LOG.info(PeepingConstants.LOG_LOGIN_PROCESS_LOGIN_ACTIVATED_MESSAGE + "' {} '", user.getText());
         password.setText(password.getText());
         user.setText(user.getText());
         if (StringUtils.isNotEmpty(password.getText()) && StringUtils.isNotEmpty(user.getText())) {
             User currentUser = new User(user.getText(), password.getText());
             DBUtil.getInstance().usersDatabaseConnect();
             String success = DBUtil.getInstance().findUser(currentUser, ReasonUtil.getLoginUserReason());
-            LOG.info("LoginProcess_login_processed_message: ' {} '", success);
+            LOG.info(PeepingConstants.LOG_LOGIN_PROCESSED_MESSAGE + "' {} '", success);
+
             DBUtil.getInstance().close();
-            resetLoginCredentials();
+            actOnLoginSuccessMessage(success);
         } else {
             renderEmptyUserCredentialMessage();
         }
@@ -82,17 +86,34 @@ public class PeepingBillController {
      */
     private void renderEmptyUserCredentialMessage() {
         if (StringUtils.isEmpty(user.getText()) && StringUtils.isEmpty(password.getText())) {
-            loginMessage.setText("*User credentials are empty");
+            loginMessage.setText(PeepingConstants.EMPTY_USER_CREDENTIALS_TEXT);
+            LOG.info(PeepingConstants.LOG_LOGIN_CREDENTIAL_ERROR_PREFIX + "{}", loginMessage.getText());
         } else if (StringUtils.isEmpty(user.getText())) {
-            loginMessage.setText("*User credential empty");
+            loginMessage.setText(PeepingConstants.EMPTY_USER_CREDENTIAL_TEXT);
+            LOG.info(PeepingConstants.LOG_LOGIN_CREDENTIAL_ERROR_PREFIX + "{}", loginMessage.getText());
         } else {
-            loginMessage.setText("*Password credential empty");
+            loginMessage.setText(PeepingConstants.EMPTY_PASSWORD_CREDENTIAL_TEXT);
+            LOG.info(PeepingConstants.LOG_LOGIN_CREDENTIAL_ERROR_PREFIX + "{}", loginMessage.getText());
+        }
+    }
+
+    private void actOnLoginSuccessMessage(String success) {
+        switch(success) {
+            case FALSE:
+                loginMessage.setText(PeepingConstants.INVALID_CREDENTIALS_MESSAGE_1);
+                break;
+            case TRUE:
+                loadPadLandingPage();
+                break;
+            default:
+                loginMessage.setText(success);
+                break;
         }
     }
 
     @FXML
     protected void onUserCreateSubmit() {
-        LOG.info("{}", "CreateUserProcess_create_user_process_initiated");
+        LOG.info("{}", PeepingConstants.LOG_CREATE_USER_PROCESS_MESSAGE);
         try {
             Stage stage = PeepingBillApplication.getPrimaryStage();
             FXMLLoader fxmlLoader = new FXMLLoader(PeepingBillApplication.class.getResource(
@@ -103,7 +124,23 @@ public class PeepingBillController {
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
-            LOG.error("Error loading Create User Scene: {}", e.getMessage());
+            LOG.error(PeepingConstants.LOG_ERROR_LOADING_CREATE_USER_SCENE + "{}", e.getMessage());
+        }
+    }
+
+    private void loadPadLandingPage() {
+        try {
+            Stage stage = PeepingBillApplication.getPrimaryStage();
+            FXMLLoader fxmlLoader = new FXMLLoader(PeepingBillApplication.class.getResource(
+                    PeepingConstants.PAD_LANDING_VIEW));
+
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setMaximized(true);
+            stage.setTitle(PeepingConstants.PAD_LANDING_VIEW_TITLE);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            LOG.error(PeepingConstants.LOG_ERROR_LOADING_PAD_BUILDER_SCENE + "{}", e.getMessage());
         }
     }
 }

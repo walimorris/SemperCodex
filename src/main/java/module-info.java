@@ -15,6 +15,12 @@ module com.smart.peepingbill {
     requires org.apache.commons.lang3;
     requires gson;
     requires org.slf4j;
+    requires java.compiler;
+    requires java.sql;
+    requires java.annotation;
+    requires org.json;
+    requires unirest.java;
+    requires javax.inject;
 
     opens com.smart.peepingbill to javafx.fxml;
     exports com.smart.peepingbill;

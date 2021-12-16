@@ -53,6 +53,7 @@ public class CreateUserController {
         String success = createUser(createUserName, createUserPassword, confirmPassword);
         if (StringUtils.equals(success, PeepingConstants.SUCCESS)) {
             successLabel.setText(success);
+            successLabel.setStyle("-fx-text-fill: green");
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
@@ -63,6 +64,7 @@ public class CreateUserController {
             loadLoginPage();
         } else {
             successLabel.setText(success);
+            successLabel.setStyle("-fx-text-fill: #ff0000");
         }
     }
 
