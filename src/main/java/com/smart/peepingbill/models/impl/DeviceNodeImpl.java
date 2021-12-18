@@ -8,6 +8,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.smart.peepingbill.models.DeviceNode;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +34,18 @@ public class DeviceNodeImpl implements DeviceNode {
     private final String externalIpAddress;
     private final String localIpaddress;
     private final String macAddress;
+    private final Boolean isHost;
     private final Map<String, String> vendorKeys;
     private final List<String> blockKeys;
     private JSONObject smartHostJsonObject;
     private String smartHostJson;
     private String smartHostJsonPrettyPrint;
 
-    public DeviceNodeImpl(String host, String ipaddress, String macAddress) {
+    public DeviceNodeImpl(String host, String ipaddress, String macAddress, Boolean bool) {
         this.hostName = host;
         this.localIpaddress = ipaddress;
         this.macAddress = macAddress;
+        this.isHost = bool;
 
         this.externalIpAddress = Objects.requireNonNull(StringUtils
                 .replace(unirestRequest(PeepingConstants.AWS_IP_CHECK_ENDPOINT), "\n", "")).trim();
@@ -82,27 +85,40 @@ public class DeviceNodeImpl implements DeviceNode {
      * Builds Device Node Json data.
      */
     private void initDeviceNode() {
-        smartHostJsonObject = initDeviceNodeJson();
+        if (isHost) {
+            smartHostJsonObject = initDeviceNodeJsonForHostDevice();
+        } else {
+            smartHostJsonObject = initDeviceNodeJsonForDevice();
+        }
         smartHostJson = smartHostJsonObject.toString();
     }
 
     /**
-     * Creates and builds the segments of the final device node's json data.
+     * Creates and builds the segments of the final host device node's json data.
      * @return {@link JSONObject}.
      */
-    private JSONObject initDeviceNodeJson() {
+    private JSONObject initDeviceNodeJsonForHostDevice() {
         JSONObject jsonObj = new JSONObject();
 
-        putHostNodeSegmentJson(jsonObj);
+        putHostDeviceNodeSegmentJson(jsonObj);
 
-        String key = loadMKQueryStr();
-        String macAddressDataRequestStr = buildMkQueryJsonRequest(key, this.macAddress);
-        String macSearchResponse = unirestRequest(macAddressDataRequestStr);
-        String deepNetworkResponse = unirestRequest(StringUtils.join(PeepingConstants.IP_API_JSON_ENDPOINT, externalIpAddress, PeepingConstants.DEEP_IP_SUFFIX));
+        String macSearchResponse = searchMacAddressAndGetResponse();
+        String deepNetworkResponse = unirestRequest(StringUtils.join(PeepingConstants.IP_API_JSON_ENDPOINT,
+                externalIpAddress, PeepingConstants.DEEP_IP_SUFFIX));
 
         putMacSearchSegmentJson(macSearchResponse, jsonObj);
         putOperatingSystemSegmentJson(jsonObj);
         putDeepNetworkSegmentJson(deepNetworkResponse, jsonObj);
+
+        return jsonObj;
+    }
+
+    private JSONObject initDeviceNodeJsonForDevice() {
+        JSONObject jsonObj = new JSONObject();
+        putGenericDeviceNodeSegmentJson(jsonObj);
+
+        String macSearchResponse = searchMacAddressAndGetResponse();
+        putMacSearchSegmentJson(macSearchResponse, jsonObj);
 
         return jsonObj;
     }
@@ -117,7 +133,9 @@ public class DeviceNodeImpl implements DeviceNode {
         StringBuilder propFileStr = new StringBuilder();
         StringBuilder mkQueryStr = new StringBuilder();
 
-        try (Reader propFile = new FileReader(String.valueOf(Path.of(String.valueOf(Paths.get(PeepingConstants.APPLICATION_PROPERTIES)))));
+        try (Reader propFile = new FileReader(String
+                .valueOf(Path.of(String.valueOf(Paths.get(PeepingConstants.APPLICATION_PROPERTIES)))));
+
             BufferedReader applicationPropReader = new BufferedReader(propFile)) {
                 propFileStr.append(propFile);
                 props.load(applicationPropReader);
@@ -157,11 +175,17 @@ public class DeviceNodeImpl implements DeviceNode {
         return response != null ? response.getBody() : null;
     }
 
+    private String searchMacAddressAndGetResponse() {
+        String key = loadMKQueryStr();
+        String macAddressDataRequestStr = buildMkQueryJsonRequest(key, this.macAddress);
+        return unirestRequest(macAddressDataRequestStr);
+    }
+
     /**
      * Input host node device's data in json object.
      * @param jsonNodeObject {@link JSONObject} overall json data object.
      */
-    private void putHostNodeSegmentJson(JSONObject jsonNodeObject) {
+    private void putHostDeviceNodeSegmentJson(JSONObject jsonNodeObject) {
         JSONObject smartDeviceInitialDataObject = new JSONObject()
                 .put(PeepingConstants.SMART_DEVICE_NODE_TYPE, PeepingConstants.HOST)
                 .put(PeepingConstants.HOST_NAME, hostName)
@@ -172,6 +196,17 @@ public class DeviceNodeImpl implements DeviceNode {
         jsonNodeObject.put(PeepingConstants.SMART_DEVICE_NODE_DETAILS, smartDeviceInitialDataObject);
     }
 
+    private void putGenericDeviceNodeSegmentJson(JSONObject jsonNodeObject) {
+        JSONObject genericDeviceInitialDataObject = new JSONObject()
+                .put(PeepingConstants.SMART_DEVICE_NODE_TYPE, PeepingConstants.CLIENT)
+                .put(PeepingConstants.LOCAL_IP_ADDRESS, localIpaddress)
+
+                // external ip address for clients?
+                .put(PeepingConstants.MAC_ADDRESS_2, macAddress);
+
+        jsonNodeObject.put(PeepingConstants.SMART_DEVICE_NODE_DETAILS, genericDeviceInitialDataObject);
+    }
+
     /**
      * Inputs data from mac address search response.
      * @param macSearchResponseBody : {@link String} search response.
@@ -179,13 +214,16 @@ public class DeviceNodeImpl implements DeviceNode {
      */
     private void putMacSearchSegmentJson(String macSearchResponseBody, JSONObject jsonNodeObject) {
         JSONObject macSearchResponseJson = new JSONObject(macSearchResponseBody);
-        JSONObject vendorDetails = macSearchResponseJson.getJSONObject(PeepingConstants.VENDOR_DETAILS);
-        JSONObject blockDetails = macSearchResponseJson.getJSONObject(PeepingConstants.BLOCK_DETAILS);
 
-        JSONObject dataFromMacSearchObject = new JSONObject();
-        putMACDetailsSegmentJson(dataFromMacSearchObject, vendorDetails, blockDetails);
-
-        jsonNodeObject.put(PeepingConstants.SMART_DEVICE_MAC_ADDRESS_DETAILS, dataFromMacSearchObject);
+        try {
+            JSONObject vendorDetails = macSearchResponseJson.getJSONObject(PeepingConstants.VENDOR_DETAILS);
+            JSONObject blockDetails = macSearchResponseJson.getJSONObject(PeepingConstants.BLOCK_DETAILS);
+            JSONObject dataFromMacSearchObject = new JSONObject();
+            putMACDetailsSegmentJson(dataFromMacSearchObject, vendorDetails, blockDetails);
+            jsonNodeObject.put(PeepingConstants.SMART_DEVICE_MAC_ADDRESS_DETAILS, dataFromMacSearchObject);
+        } catch (JSONException e) {
+            LOG.error("Error querying mac-address api endpoint. Please check api: {}", e.getMessage());
+        }
     }
 
     /**

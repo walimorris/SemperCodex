@@ -23,14 +23,12 @@ public class HostLANMapImpl implements HostLANMap {
     private final String ipaddress;
     private final String hostname;
     private final String secretKey;
-    private final Map<String, String> ipToHostMap;
+    private final String[] ipToHostArray;
 
     public HostLANMapImpl(String key) {
         ipaddress = NetworkUtil.getIpaddress();
         hostname = NetworkUtil.getHost();
-        ipToHostMap = Map.of(PeepingConstants.IP_ADDRESS, ipaddress,
-                PeepingConstants.HOST_NAME, hostname);
-
+        ipToHostArray = new String[]{ipaddress, hostname};
         secretKey = key;
     }
 
@@ -43,7 +41,7 @@ public class HostLANMapImpl implements HostLANMap {
     public String getHostname() { return this.hostname; }
 
     @Override
-    public Map<String, String> getIpToHostMap() { return ipToHostMap; }
+    public String[] getIpToHostArray() { return ipToHostArray; }
 
     @Override
     public Map<String, String> getLANMacAddresses() {

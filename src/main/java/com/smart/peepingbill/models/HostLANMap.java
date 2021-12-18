@@ -23,7 +23,7 @@ public interface HostLANMap {
      * Get {@link Map} containing ipaddress and host name.
      * @return {@link Map}
      */
-    Map<String, String> getIpToHostMap();
+    String[] getIpToHostArray();
 
     /**
      * Get Addresses of all devices in host Local Area Network.

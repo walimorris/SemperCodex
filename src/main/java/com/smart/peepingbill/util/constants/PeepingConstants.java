@@ -25,6 +25,7 @@ public final class PeepingConstants {
     public static final String FALSE = "false";
     public static final String REGION = "region";
     public static final String MESSAGE = "message";
+    public static final String ERROR = "error";
     public static final String LINUX = "Linux";
     public static final String CITY = "city";
     public static final String ZIP = "zip";
@@ -80,6 +81,9 @@ public final class PeepingConstants {
     public static final String NMAP_SCAN_REPORT = "Nmap scan report";
     public static final String GATEWAY = "_gateway";
     public static final String HOST = "host";
+    public static final String HOST_SMART_NODE = "hostSmartNode";
+    public static final String DEVICE_SMART_NODE = "deviceSmartNode";
+    public static final String CLIENT = "client";
     public static final String HOST_NAME = "hostName";
     public static final String IP_ADDRESS = "ipAddress";
     public static final String LOCAL_IP_ADDRESS = "localIpAddress";

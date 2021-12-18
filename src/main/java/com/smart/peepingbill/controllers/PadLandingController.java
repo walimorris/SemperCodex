@@ -5,6 +5,7 @@ import com.smart.peepingbill.models.HostLANMap;
 import com.smart.peepingbill.models.SudoPopupWindow;
 import com.smart.peepingbill.models.impl.DeviceNodeImpl;
 import com.smart.peepingbill.models.impl.HostLANMapImpl;
+import com.smart.peepingbill.models.impl.SmartSystemNetworkImpl;
 import com.smart.peepingbill.models.impl.SudoPopupWindowImpl;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.application.ConditionalFeature;
@@ -14,17 +15,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -52,9 +53,11 @@ public class PadLandingController implements Initializable {
     @FXML
     private Button popupSubmit;
 
+    private String[] ipHostArray;
     private Map<String, String> macAddresses;
     private SudoPopupWindow sudoPopupWindow;
     private Stage currentStage;
+    private SmartSystemNetworkImpl smartSystemNetwork;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -74,40 +77,47 @@ public class PadLandingController implements Initializable {
 
         sudoPopupWindow.popup();
 
+        // build smart system network on click
         popupSubmit.setOnMouseClicked(mouseEvent -> {
             sudoPopupWindow.getSudoFromUser();
 
             if (sudoPopupWindow.isSudoSet()) {
                 HostLANMap hostLANMap = new HostLANMapImpl(sudoPopupWindow.getSudo());
                 sudoPopupWindow.voidSudo();
+
+                ipHostArray = hostLANMap.getIpToHostArray();
                 macAddresses = hostLANMap.getLANMacAddresses();
 
-                ArrayList<String> addressArray = new ArrayList<>();
-                ArrayList<Label> labelAddressArray = new ArrayList<>();
-
-                String ip = null;
-                String mac = null;
-                int i = 0;
-
-                for (String key : macAddresses.keySet()) {
-                    addressArray.add(key + macAddresses.get(key));
-
-                    if (i == 0) {
-                        ip = macAddresses.get(key);
-                        mac = key;
-                        i++;
-                    }
-
-                    Label addressData = new Label(key + " = " + macAddresses.get(key));
-                    labelAddressArray.add(addressData);
-                }
-
-                labelAddressArray.forEach((label) -> padLandingVBox.getChildren().add(label));
-
-                DeviceNode hostNode = new DeviceNodeImpl("Test Node", ip, mac);
-                System.out.println(hostNode.getSmartDeviceJsonString());
+                parseSmartSystemNetworkJsonData();
             }
         });
 
+    }
+
+    private void parseSmartSystemNetworkJsonData() {
+        String ip;
+        String mac;
+        JSONObject smartSystemJson = new JSONObject();
+
+        int deviceCount = 0;
+
+        for (String key : macAddresses.keySet()) {
+
+            if (StringUtils.equals(macAddresses.get(key), ipHostArray[0])) {
+                ip = ipHostArray[0];
+                mac = key;
+                DeviceNode hostNode = new DeviceNodeImpl(ipHostArray[1], ip, mac, true);
+                smartSystemJson.put(PeepingConstants.HOST_SMART_NODE, hostNode.getSmartDeviceJsonObject());
+            } else {
+                ip = macAddresses.get(key);
+                mac = key;
+                DeviceNode deviceNode = new DeviceNodeImpl(PeepingConstants.DEVICE_SMART_NODE + deviceCount,
+                        ip, mac, false);
+                smartSystemJson.put(PeepingConstants.DEVICE_SMART_NODE + deviceCount, deviceNode.getSmartDeviceJsonObject());
+                deviceCount = deviceCount + 1;
+            }
+        }
+        smartSystemNetwork = new SmartSystemNetworkImpl(smartSystemJson);
+        System.out.println(smartSystemNetwork.getSmartSystemJSON());
     }
 }

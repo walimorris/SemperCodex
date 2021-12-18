@@ -47,6 +47,7 @@ public class SudoPopupWindowImpl implements SudoPopupWindow {
         sudo = new StringBuilder(sudoField.getText());
 
         if (sudo.length() > 4) {
+            sudoField.clear();
             popupWindow.hide();
             sudoSet = true;
         }
