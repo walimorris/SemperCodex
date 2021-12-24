@@ -83,7 +83,7 @@ public class NetworkUtil {
 
     /**
      * Returns the network segment from the given ip-address. That is, the first two 8-bit parts
-     * of a four bit ip-address.
+     * of an ip-address containing four 8-bit parts.
      * @param ip : ip address
      * @return {@link String}
      */
