@@ -12,7 +12,7 @@ public interface DeviceNode {
 
     /**
      * Get Smart Host Device data parsed as json.
-     * @return
+     * @return {@link JSONObject}
      */
     JSONObject getSmartDeviceJsonObject();
 
@@ -20,4 +20,11 @@ public interface DeviceNode {
      * Pretty Print Smart Host Device Json.
      */
     void prettyPrint();
+
+    /**
+     * Void sudo.
+     */
+    void voidSudo();
+
+    String getNmapScanResponse();
 }

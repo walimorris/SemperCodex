@@ -32,6 +32,9 @@ public final class PeepingConstants {
     public static final String ISP = "isp";
     public static final String SUBMIT = "submit";
     public static final String MOBILE = "mobile";
+    public static final String PORT = "PORT";
+    public static final String STATE = "STATE";
+    public static final String SERVICE = "SERVICE";
     public static final String PROXY = "proxy";
     public static final String HOSTING = "hosting";
     public static final String CREATE_USER = "create_user";
@@ -78,7 +81,6 @@ public final class PeepingConstants {
     // network constants
     public static final String MAC_ADDRESS_1 = "MAC Address";
     public static final String MAC_ADDRESS_2 = "macAddress";
-    public static final String NMAP_SCAN_REPORT = "Nmap scan report";
     public static final String GATEWAY = "_gateway";
     public static final String HOST = "host";
     public static final String HOST_SMART_NODE = "hostSmartNode";
@@ -140,6 +142,22 @@ public final class PeepingConstants {
     public static final String SMART_DEVICE_SYSTEM_LANGUAGE = "smartDeviceLanguage";
     public static final String SMART_DEVICE_OS_VERSION = "smartDeviceVersion";
     public static final String SMART_DEVICE_USER_COUNTRY = "smartDeviceUserCountry";
+
+    // nmap constants
+    public static final String NMAP_SCAN_REPORT = "Nmap scan report";
+    public static final String NMAP_SCANNING = "Scanning";
+    public static final String NMAP_HOST_OS_SCAN_NOT_NECESSARY = "host os scan not necessary";
+    public static final String NMAP_ALL_1000_SCANNED_PORTS = "All 1000 scanned ports";
+    public static final String NMAP_ARE_CLOSED = "are closed";
+    public static final String NMAP_ALL_1000_PORTS_ARE_CLOSED = "All 1000 scanned ports are closed";
+    public static final String NMAP_AGGRESSIVE_OS_GUESSES = "Aggressive OS guesses";
+    public static final String NMAP_WARNING = "Warning";
+    public static final String NMAP_TOO_MANY_FINGERPRINTS_MATCH = "Too many fingerprints match";
+    public static final String NMAP_OS_DETAILS = "OS details";
+    public static final String NMAP_RUNNING = "Running";
+    public static final String NMAP_DEVICE_SCAN_FOR_MAC_ADDRESSES = "sudo -S nmap -sn";
+    public static final String NMAP_DEVICE_SCAN_FOR_OS = "sudo nmap -Pn -v -O";
+    public static final String NMAP_CONTAINS_PORT_STATE_SERVICE = "port_state-service";
 
 
     /**

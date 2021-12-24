@@ -4,6 +4,37 @@
     -fx-background-color: teal;
 }
 
+#vboxLeft {
+    -fx-background-color: #4d4d4d;
+    -fx-padding: 50px;
+}
+
+#gridpaneCenter {
+    -fx-background-color: #fff;
+}
+
+#gridpaneHbox {
+    -fx-background-color: teal;
+}
+
+#smartNetworkTabLabel {
+    -fx-text-fill: #fff;
+    -fx-font-family: AnjaliOldLipi;
+    -fx-font-size: 22px;
+}
+
+#buildNetworkButton {
+    -fx-background-color: transparent;
+    -fx-font-size: 16px;
+    -fx-text-fill: #fff;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+#buildNetworkButton:hover {
+    -fx-font-weight: bold;
+}
+
 #headerText {
     -fx-text-fill: #ffffff;
     -fx-padding: 10px;

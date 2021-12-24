@@ -6,6 +6,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.smart.peepingbill.models.DeviceNode;
+import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -35,17 +36,21 @@ public class DeviceNodeImpl implements DeviceNode {
     private final String localIpaddress;
     private final String macAddress;
     private final Boolean isHost;
+    private String sudo;
+    private String nmapScan;
     private final Map<String, String> vendorKeys;
     private final List<String> blockKeys;
     private JSONObject smartHostJsonObject;
     private String smartHostJson;
     private String smartHostJsonPrettyPrint;
 
-    public DeviceNodeImpl(String host, String ipaddress, String macAddress, Boolean bool) {
+    public DeviceNodeImpl(String host, String ipaddress, String macAddress, String pw, Boolean bool) {
         this.hostName = host;
+        this.sudo = pw;
         this.localIpaddress = ipaddress;
         this.macAddress = macAddress;
         this.isHost = bool;
+        this.nmapScan = NetworkUtil.scanDeviceForOS(localIpaddress, sudo);
 
         this.externalIpAddress = Objects.requireNonNull(StringUtils
                 .replace(unirestRequest(PeepingConstants.AWS_IP_CHECK_ENDPOINT), "\n", "")).trim();
@@ -79,6 +84,16 @@ public class DeviceNodeImpl implements DeviceNode {
                 .setPrettyPrinting()
                 .create();
         smartHostJsonPrettyPrint = gson.toJson(smartHostJson);
+    }
+
+    @Override
+    public void voidSudo() {
+        this.sudo = null;
+    }
+
+    @Override
+    public String getNmapScanResponse() {
+        return this.nmapScan;
     }
 
     /**

@@ -1,12 +1,11 @@
 package com.smart.peepingbill.controllers;
 
 import com.smart.peepingbill.models.DeviceNode;
-import com.smart.peepingbill.models.HostLANMap;
 import com.smart.peepingbill.models.SudoPopupWindow;
 import com.smart.peepingbill.models.impl.DeviceNodeImpl;
-import com.smart.peepingbill.models.impl.HostLANMapImpl;
 import com.smart.peepingbill.models.impl.SmartSystemNetworkImpl;
 import com.smart.peepingbill.models.impl.SudoPopupWindowImpl;
+import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
@@ -15,10 +14,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -39,13 +39,16 @@ public class PadLandingController implements Initializable {
     private Button buildNetworkButton;
 
     @FXML
-    private VBox padLandingVBox;
+    private VBox vboxLeft;
 
     @FXML
-    private TextField addresses;
+    private GridPane gridpaneCenter;
 
     @FXML
-    private Circle hostBoxNode;
+    private HBox gridpaneHbox;
+
+    @FXML
+    private Label smartNetworkTabLabel;
 
     @FXML
     private PasswordField sudo;
@@ -53,6 +56,7 @@ public class PadLandingController implements Initializable {
     @FXML
     private Button popupSubmit;
 
+    private boolean is3DSupported;
     private String[] ipHostArray;
     private Map<String, String> macAddresses;
     private SudoPopupWindow sudoPopupWindow;
@@ -63,11 +67,11 @@ public class PadLandingController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         sudo = new PasswordField();
         popupSubmit = new Button(PeepingConstants.SUBMIT);
+        is3DSupported = Platform.isSupported(ConditionalFeature.SCENE3D);
     }
 
     @FXML
     protected void onBuildNetworkButtonClick(ActionEvent e) {
-        boolean is3DSupported = Platform.isSupported(ConditionalFeature.SCENE3D);
         if (!is3DSupported) {
             LOG.info("JavaFx 3D Platform Engine is not supported on this host system.");
         }
@@ -82,19 +86,19 @@ public class PadLandingController implements Initializable {
             sudoPopupWindow.getSudoFromUser();
 
             if (sudoPopupWindow.isSudoSet()) {
-                HostLANMap hostLANMap = new HostLANMapImpl(sudoPopupWindow.getSudo());
+                ipHostArray = new String[]{NetworkUtil.getIpaddress(), NetworkUtil.getHost()};
+                macAddresses = NetworkUtil.getLanDeviceMacAndIpAddresses(sudoPopupWindow.getSudo());
+
+                parseSmartSystemNetworkJsonData(sudoPopupWindow.getSudo());
                 sudoPopupWindow.voidSudo();
 
-                ipHostArray = hostLANMap.getIpToHostArray();
-                macAddresses = hostLANMap.getLANMacAddresses();
-
-                parseSmartSystemNetworkJsonData();
+                // build 2d smart system network ui
             }
         });
 
     }
 
-    private void parseSmartSystemNetworkJsonData() {
+    private void parseSmartSystemNetworkJsonData(String sudo) {
         String ip;
         String mac;
         JSONObject smartSystemJson = new JSONObject();
@@ -106,14 +110,18 @@ public class PadLandingController implements Initializable {
             if (StringUtils.equals(macAddresses.get(key), ipHostArray[0])) {
                 ip = ipHostArray[0];
                 mac = key;
-                DeviceNode hostNode = new DeviceNodeImpl(ipHostArray[1], ip, mac, true);
+                DeviceNode hostNode = new DeviceNodeImpl(ipHostArray[1], ip, mac, sudo, true);
+                System.out.println(hostNode.getNmapScanResponse());
                 smartSystemJson.put(PeepingConstants.HOST_SMART_NODE, hostNode.getSmartDeviceJsonObject());
+                hostNode.voidSudo();
             } else {
                 ip = macAddresses.get(key);
                 mac = key;
                 DeviceNode deviceNode = new DeviceNodeImpl(PeepingConstants.DEVICE_SMART_NODE + deviceCount,
-                        ip, mac, false);
+                        ip, mac, sudo, false);
+                System.out.println(deviceNode.getNmapScanResponse());
                 smartSystemJson.put(PeepingConstants.DEVICE_SMART_NODE + deviceCount, deviceNode.getSmartDeviceJsonObject());
+                deviceNode.voidSudo();
                 deviceCount = deviceCount + 1;
             }
         }
