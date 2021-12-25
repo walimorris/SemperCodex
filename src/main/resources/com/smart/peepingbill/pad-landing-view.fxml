@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.*?>
-<?import java.net.URL?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.smart.peepingbill.controllers.PadLandingController">
     <stylesheets>
@@ -17,6 +19,5 @@
     </left>
     <center>
         <GridPane fx:id="gridpaneCenter"/>
-        <HBox fx:id="gridpaneHbox" alignment="TOP_RIGHT"/>
     </center>
 </BorderPane>
