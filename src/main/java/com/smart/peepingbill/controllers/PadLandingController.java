@@ -22,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,14 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Defines the code for {@code com/smart/peepingbill/pad-landingp-view.fxml}
+ * Defines the code for {@code com/smart/peepingbill/pad-landingp-view.fxml}. The pad-landing view
+ * features the main system network building page, that is, there is a feature to build out a visual
+ * representation of your local area network and all reachable devices on the network. The underlying
+ * data-structure for device data is held within a {@link JSONObject}.
+ *
+ * @author Wali Morris<walimmorris@gmail.com>
+ * created on 2021/12/24
+ *
  */
 public class PadLandingController implements Initializable {
     private static final Logger LOG = LoggerFactory.getLogger(PadLandingController.class);
@@ -100,6 +108,47 @@ public class PadLandingController implements Initializable {
         deviceCount = 0;
     }
 
+    /**
+     * Get current stage.
+     * @return {@link Stage}
+     */
+    @Nullable
+    private Stage getCurrentStage() {
+        if (currentStage != null) {
+            return currentStage;
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     * Get Smart System Network (current local area network) system, it's devices and data
+     * represented as {@link JSONObject}.
+     * </p>
+     * @return {@link JSONObject}
+     */
+    @Nullable
+    private JSONObject getSmartSystemNetworkJSON() {
+        if (smartSystemNetwork != null) {
+            return smartSystemNetwork.getSmartSystemJSON();
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     * The underlying data-structure which holds the data for each device on a user's local area
+     * network is held within a {@link JSONObject}. As the system network data-structure is
+     * constructed, each device is represented and created as a device node {@link DeviceNodeImpl}
+     * with its json data appended to the single json object. This json object and its data
+     * is then passed to a smart system network object {@link SmartSystemNetworkImpl} that finalizes
+     * the system network build.
+     * </p>
+     *
+     * @param sudo secret key from {@link SudoPopupWindowImpl}
+     * @see        DeviceNodeImpl
+     * @see        SmartSystemNetworkImpl
+     */
     private void parseSmartSystemNetworkJsonData(String sudo) {
         JSONObject smartSystemJson = new JSONObject();
 
@@ -118,9 +167,27 @@ public class PadLandingController implements Initializable {
         System.out.println(smartSystemNetwork.getSmartSystemJSON());
     }
 
-    private void initDeviceNode(String deviceType, String ipaddress, String mac, String key, boolean isHost,
+    /**
+     * <p>
+     * Adds a {@link DeviceNodeImpl} device to the given smart system json object which will then be passed
+     * to the final {@link SmartSystemNetworkImpl} that builds a {@link JSONObject} representing the local
+     * area network consisting of all devices and its data.
+     * </p>
+     * @param deviceName            device name
+     * @param ipaddress             the device ip-address
+     * @param mac                   the device mac-address
+     * @param key                   the secret key to run system commands
+     * @param isHost                determines if the {@link DeviceNodeImpl} being created is a host or not
+     * @param smartSystemJsonObject the smart system json object that'll be passed to the
+     *                              finalizing {@link SmartSystemNetworkImpl} object
+     *
+     * @see DeviceNodeImpl#getNmapScanResponse()
+     * @see JSONObject
+     * @see SmartSystemNetworkImpl
+     */
+    private void initDeviceNode(String deviceName, String ipaddress, String mac, String key, boolean isHost,
                                          JSONObject smartSystemJsonObject) {
-        DeviceNodeImpl node = new DeviceNodeImpl(deviceType, ipaddress, mac, key, isHost);
+        DeviceNodeImpl node = new DeviceNodeImpl(deviceName, ipaddress, mac, key, isHost);
         System.out.println(node.getNmapScanResponse());
         if (isHost) {
             smartSystemJsonObject.put(PeepingConstants.HOST_SMART_NODE, node.getSmartDeviceJsonObject());
@@ -130,6 +197,15 @@ public class PadLandingController implements Initializable {
         node.voidSudo();
     }
 
+    /**
+     * Builds the final representation of the local area network's system that includes all devices
+     * and its data. This process is run as a {@link Task} on a separate thread, as a background
+     * process, supplied with its own {@link ProgressBar} that informs the user that the build
+     * process is underway.
+     *
+     * @see NetworkUtil#getLanDeviceMacAndIpAddresses(String)
+     * @see #parseSmartSystemNetworkJsonData(String)
+     */
     public void initBuildSmartSystemJsonData() {
         ProgressBar bar = new ProgressBar();
         gridpaneCenter.getChildren().add(bar);
@@ -137,8 +213,9 @@ public class PadLandingController implements Initializable {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                // disable while task is in progress
+                // disable build-network ui button while task is in progress
                 buildNetworkButton.setDisable(true);
+
                 ipHostArray = new String[]{NetworkUtil.getIpaddress(), NetworkUtil.getHost()};
                 macAddresses = NetworkUtil.getLanDeviceMacAndIpAddresses(sudoPopupWindow.getSudo());
 
@@ -148,7 +225,8 @@ public class PadLandingController implements Initializable {
             }
         };
 
-        //bind progress bar to task
+        // bind progress bar to task, disable build-network button while in process
+        // enable build-network button once task complete
         bar.progressProperty().bind(task.progressProperty());
         task.setOnRunning(workerStateEvent -> buildNetworkButton.setDisable(true));
         task.setOnSucceeded(workerStateEvent -> {
