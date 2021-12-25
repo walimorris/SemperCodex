@@ -39,7 +39,6 @@ import java.util.ResourceBundle;
  *
  * @author Wali Morris<walimmorris@gmail.com>
  * created on 2021/12/24
- *
  */
 public class PadLandingController implements Initializable {
     private static final Logger LOG = LoggerFactory.getLogger(PadLandingController.class);

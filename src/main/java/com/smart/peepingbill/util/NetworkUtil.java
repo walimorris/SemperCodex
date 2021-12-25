@@ -1,6 +1,8 @@
 package com.smart.peepingbill.util;
 
 import com.smart.peepingbill.util.constants.PeepingConstants;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * <p>
+ * Defines the code for {@code com/smart/peepingbill/util/NetworkUtil.java}. The NetworkUtil consists
+ * of various operations used for receiving, passing or commanding network data. Contains helper
+ * functions that can be used throughout the application code base to ease the use of network
+ * functionality. A simple use case is utilizing the java.net {@link Inet4Address} package to obtain
+ * network host and ip-address.
+ * </p>
+ *
+ * @author Wali Morris<walimmorris@gmaill.com>
+ * created on 2021/12/24
+ */
 public class NetworkUtil {
     private static final Logger LOG = LoggerFactory.getLogger(NetworkUtil.class);
 
@@ -28,8 +42,9 @@ public class NetworkUtil {
     private static boolean readOpenPorts = false;
 
     /**
-     * Get host ipaddress.
+     * Get host ip-address.
      * @return {@link String}
+     * @see    Inet4Address#getHostAddress()
      */
     public static String getIpaddress() {
         String ipaddress = null;
@@ -44,6 +59,7 @@ public class NetworkUtil {
     /**
      * Get host name.
      * @return {@link String}
+     * @see    Inet4Address#getHostName()
      */
     public static String getHost() {
         String host = null;
@@ -56,11 +72,15 @@ public class NetworkUtil {
     }
 
     /**
+     * <p>
      * Runs nmap command with host ipaddress to scan all devices on local area network. Builds
-     * a {@link Map} containing key:mac-address to value:ipaddress.
-     * @param key : sudo pass
-     * @return {@link Map}
+     * a {@link Map} containing key:mac-address to value:ip-address.
+     * @param key sudo secret key
+     * @return    {@link Map}
+     *
+     * @see      #writeDeviceMacAndIpAddresses(BufferedReader)
      */
+    @NotNull
     public static Map<String, String> getLanDeviceMacAndIpAddresses(String key) {
         String ipaddress = getIpaddress();
         BufferedReader bufferedReader = spawnProcess(PeepingConstants.NMAP_DEVICE_SCAN_FOR_MAC_ADDRESSES +
@@ -69,12 +89,16 @@ public class NetworkUtil {
     }
 
     /**
+     * <p>
      * Runs nmap command with given local area network device ipaddress and returns {@link String}
-     * response containing data regarding the devices operating system.
-     * @param address : ipaddress of device
-     * @param key : sudo pass
-     * @return {@link String}
+     * response containing device operating system information.
+     * </p>
+     * @param address ip-address of device
+     * @param key     sudo secret key
+     * @return        {@link String}
+     * @see           #writeDeviceScanForOsResponse(BufferedReader, String)
      */
+    @NotNull
     public static String scanDeviceForOS(String address, String key) {
         BufferedReader bufferedReader = spawnProcess(PeepingConstants.NMAP_DEVICE_SCAN_FOR_OS +
                 " " + address, key);
@@ -82,11 +106,14 @@ public class NetworkUtil {
     }
 
     /**
+     * <p>
      * Returns the network segment from the given ip-address. That is, the first two 8-bit parts
      * of an ip-address containing four 8-bit parts.
-     * @param ip : ip address
-     * @return {@link String}
+     * </p>
+     * @param ip ip-address
+     * @return   {@link String}
      */
+    @NotNull
     private static String getIPNetworkSegment(String ip) {
         int count = 0, dotCount = 0;
         StringBuilder partialIp = new StringBuilder();
@@ -104,11 +131,14 @@ public class NetworkUtil {
     }
 
     /**
+     * <p>
      * Spawns process for given command and creates a {@link BufferedReader} to read in and
      * process the returned response from given command.
-     * @param cmd : given command
-     * @param key : sudo pass
-     * @return {@link BufferedReader}
+     * </p>
+     * @param cmd given command
+     * @param key sudo pass
+     * @return    {@link BufferedReader}
+     * @see       #isInvalidKey(byte[], StringBuilder)
      */
     private static BufferedReader spawnProcess(String cmd, String key) {
         BufferedReader bufferedReader = null;
@@ -143,15 +173,25 @@ public class NetworkUtil {
 
     /**
      * Returns if key is valid or not.
-     * @param keyByteArray : key byte array
-     * @param key : {@link String key}
-     * @return boolean
+     * @param keyByteArray  key byte array
+     * @param key           {@link String key}
+     * @return              boolean
      */
     private static boolean isInvalidKey(byte[] keyByteArray, StringBuilder key) {
         return keyByteArray.length == 0 && key.length() == 0;
     }
 
-    private static StringBuilder writeDeviceScanForOsResponse(BufferedReader bufferedReader, String address) {
+    /**
+     * Iterates through the response from nmap os scan and returns key data from each line.
+     * Lines that contain key operating system data is appended to the final response
+     * {@link StringBuilder} data from the nmap os scan.
+     * @param bufferedReader {@link BufferedReader} contains the buffered response from nmap os scan
+     * @param address        the ip-address being scanned
+     * @return               {@link StringBuilder} response containing key operating system data
+     * @see                  #appendNmapOSScanValue(String, StringBuilder)
+     */
+    @NotNull
+    private static StringBuilder writeDeviceScanForOsResponse(@NotNull BufferedReader bufferedReader, String address) {
         StringBuilder response = new StringBuilder(address + "\n");
         try {
             String line = bufferedReader.readLine();
@@ -177,11 +217,14 @@ public class NetworkUtil {
 
     /**
      * Writes mac-addresses and ip-addresses to addresses map based on each line of the {@link BufferedReader}
-     * containing special keywords depicting the presence of either a mac or ip address.
-     * @param bufferedReader : {@link BufferedReader}
-     * @return {@link Map}
+     * containing special keywords depicting the presence of either a device mac-address or ip-address.
+     * @param bufferedReader {@link BufferedReader}
+     * @return               {@link Map}
+     * @see                  #extractMacAddressFromNmapLine(String)
+     * @see                  #extractIpAddressFromNmapLine(String)
      */
-    private static Map<String, String> writeDeviceMacAndIpAddresses(BufferedReader bufferedReader) {
+    @NotNull
+    private static Map<String, String> writeDeviceMacAndIpAddresses(@NotNull BufferedReader bufferedReader) {
         Map<String, String> addresses = new HashMap<>();
         try {
             String line = bufferedReader.readLine();
@@ -214,10 +257,11 @@ public class NetworkUtil {
 
     /**
      * Extracts mac address from given line from nmap command response.
-     * @param line : line from nmap response
-     * @return {@link String}
+     * @param line line from nmap response
+     * @return     {@link String}
      */
-    private static String extractMacAddressFromNmapLine(String line) {
+    @Nullable
+    private static String extractMacAddressFromNmapLine(@NotNull String line) {
         if (line.length() > 30) {
             return line.substring(13, 30);
         }
@@ -225,22 +269,27 @@ public class NetworkUtil {
     }
 
     /**
-     * Extracts ip address from given line from nmap command response.
-     * Returns host ip address if line contains hostname.
-     * @param line : line from nmap response
-     * @return {@link String}
+     * Extracts ip-address from given line from nmap command response.
+     * Returns the host ip-address if the line contains hostname.
+     * @param line line from nmap response
+     * @return     {@link String}
      */
-    private static String extractIpAddressFromNmapLine(String line) {
+    @NotNull
+    private static String extractIpAddressFromNmapLine(@NotNull String line) {
         return line.contains(getHost()) ? getIpaddress() : line.substring(21);
     }
 
     /**
+     * <p>
      * Builds the response from nmap operating system scan. A single line from the nmap os scan is run
-     * through this routine and checked against key strings. If a line contains the value of a key string,
-     * then the given response for that line is given. Important operating system data is returned in
+     * through this routine and checked against important strings containing data needed for the nmap
+     * os scan. If a line from nmap scan contains the value of a needed string, then that line is
+     * appended to the response. Important operating system data is added to the final nmap os scan
      * response.
-     * @param line : single line from nmap os scan
-     * @param response : response containing important os scan data
+     * </p>
+     * @param line     single line from nmap os scan
+     * @param response response containing important os scan data
+     * @see            PeepingConstants
      */
     private static void appendNmapOSScanValue(String line, StringBuilder response) {
         String match = null;
