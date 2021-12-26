@@ -8,6 +8,21 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Defines the code for {@code com/smart/peepingbill/models/impl/SudoPopupWindowImpl.java} class.
+ * The SudoPopupWindow utilizing the {@link Popup} object underneath. The SudoPopupWindow is
+ * used to create a Popup that requests the user to enter the Linux system sudo password. Sudo
+ * is needed for access to many Linux commands. Voiding sudo means to erase the characters used.
+ * This is for security reasons, as sudo will never be stored, by this application, on or off of
+ * a user's system.
+ *
+ * @author Wali Morris<walimmorris@gmail.com>
+ * created on 2021/12/26
+ *
+ * @see Popup
+ * @see javafx.stage.PopupWindow
+ *
+ */
 public class SudoPopupWindowImpl implements SudoPopupWindow {
     private static final Logger LOG = LoggerFactory.getLogger(SudoPopupWindowImpl.class);
 
@@ -19,6 +34,13 @@ public class SudoPopupWindowImpl implements SudoPopupWindow {
     private StringBuilder sudo;
     private boolean sudoSet;
 
+    /**
+     * Constructor for sudo Popup window. Creates a {@link SudoPopupWindowImpl} on the
+     * application's current stage environment.
+     * @param stage         current stage {@link Stage}
+     * @param passwordField sudo key {@link PasswordField}
+     * @param submitButton  SudoPopupWindow's submit button {@link Button}
+     */
     public SudoPopupWindowImpl(Stage stage, PasswordField passwordField, Button submitButton) {
         currentStage = stage;
         popupWindow = new Popup();

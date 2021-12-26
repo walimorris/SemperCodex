@@ -4,17 +4,17 @@ pipeline {
     stages {
 
         stage("build") {
+            when {
+                expression {
+                    BRANCH_NAME == 'dev' || BRANCH_NAME == 'master'
+                }
+            }
             steps {
                 echo 'building the application...'
             }
         }
 
         stage ("test") {
-            when {
-                expression {
-                    BRANCH_NAME == 'dev' || BRANCH_NAME == 'master'
-                }
-            }
             steps {
                 echo 'running application tests...'
             }

@@ -5,6 +5,9 @@ import javafx.scene.control.PasswordField;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
+/**
+ * Defines the interface for {@link com.smart.peepingbill.models.impl.SudoPopupWindowImpl} class.
+ */
 public interface SudoPopupWindow {
 
     /**
@@ -13,8 +16,14 @@ public interface SudoPopupWindow {
      */
     Popup getPopupWindow();
 
+    /**
+     * Show sudo popup window.
+     */
     void popup();
 
+    /**
+     * Remove and null sudo key.
+     */
     void voidSudo();
 
     /**

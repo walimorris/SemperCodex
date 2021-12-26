@@ -26,12 +26,22 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+/**
+ * Defines the code for {@code com/smart/peepingbill/models/impl/DeviceNodeImpl.java} class. A device
+ * node is derived from scanning the local area network and pulling the ip and mac-addresses from each
+ * device. Supplied with this information, you can obtain much more information about each device from
+ * the local system as well as various external sources. A device node data is structured as a
+ * {@link JSONObject} depicting various details of a device.
+ *
+ * @author Wali Morris<walimmorris@gmail.com>
+ * created on 2021/12/26
+ */
 public class DeviceNodeImpl implements DeviceNode {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceNodeImpl.class);
 
     private boolean vpnActive;
     private String isp;
-    private final String hostName;
+    private final String name;
     private final String externalIpAddress;
     private final String localIpaddress;
     private final String macAddress;
@@ -44,23 +54,34 @@ public class DeviceNodeImpl implements DeviceNode {
     private String smartHostJson;
     private String smartHostJsonPrettyPrint;
 
-    public DeviceNodeImpl(String host, String ipaddress, String macAddress, String pw, Boolean bool) {
-        this.hostName = host;
-        this.sudo = pw;
+    /**
+     * DeviceNodeImpl constructor.
+     * @param deviceName device name
+     * @param ipaddress  device ip-address
+     * @param macAddress device mac-address
+     * @param sudo       sudo key
+     * @param isHost     determines if device is host device or not
+     */
+    public DeviceNodeImpl(String deviceName, String ipaddress, String macAddress, String sudo, Boolean isHost) {
+        this.name = deviceName;
+        this.sudo = sudo;
         this.localIpaddress = ipaddress;
         this.macAddress = macAddress;
-        this.isHost = bool;
+        this.isHost = isHost;
         this.nmapScan = NetworkUtil.scanDeviceForOS(localIpaddress, sudo);
 
+        // use AWS service to receive device external ip address
         this.externalIpAddress = Objects.requireNonNull(StringUtils
                 .replace(unirestRequest(PeepingConstants.AWS_IP_CHECK_ENDPOINT), "\n", "")).trim();
 
+        // build map object for device vendor data
         vendorKeys = Map.of(PeepingConstants.OUI, PeepingConstants.VENDOR_OUI,
                 PeepingConstants.IS_PRIVATE, PeepingConstants.VENDOR_IS_PRIVATE,
                 PeepingConstants.COMPANY_NAME, PeepingConstants.VENDOR_COMPANY_NAME,
                 PeepingConstants.COMPANY_ADDRESS, PeepingConstants.VENDOR_COMPANY_ADDRESS,
                 PeepingConstants.COUNTRY_CODE, PeepingConstants.VENDOR_COUNTRY_CODE);
 
+        // build list object for device block data
         blockKeys = List.of(PeepingConstants.BLOCK_FOUND, PeepingConstants.BORDER_LEFT, PeepingConstants.BORDER_RIGHT,
                 PeepingConstants.BLOCK_SIZE, PeepingConstants.ASSIGNMENT_BLOCK_SIZE, PeepingConstants.DATE_CREATED,
                 PeepingConstants.DATE_UPDATED);
@@ -92,12 +113,20 @@ public class DeviceNodeImpl implements DeviceNode {
     }
 
     @Override
+    public String getDeviceName() {
+        return this.name;
+    }
+
+    @Override
     public String getNmapScanResponse() {
         return this.nmapScan;
     }
 
     /**
-     * Builds Device Node Json data.
+     * Builds Device Node JSON data as {@link JSONObject} based on device type(host, client).
+     *
+     * @see #initDeviceNodeJsonForDevice()
+     * @see #initDeviceNodeJsonForHostDevice()
      */
     private void initDeviceNode() {
         if (isHost) {
@@ -109,7 +138,7 @@ public class DeviceNodeImpl implements DeviceNode {
     }
 
     /**
-     * Creates and builds the segments of the final host device node's json data.
+     * Creates and builds each segment of the final host device node's json data.
      * @return {@link JSONObject}.
      */
     private JSONObject initDeviceNodeJsonForHostDevice() {
@@ -128,6 +157,14 @@ public class DeviceNodeImpl implements DeviceNode {
         return jsonObj;
     }
 
+    /**
+     * Creates and builds each segment of the final client device node's json data.
+     * @return {@link JSONObject}.
+     *
+     * @see    #putGenericDeviceNodeSegmentJson(JSONObject)
+     * @see    #searchMacAddressAndGetResponse()
+     * @see    #putMacSearchSegmentJson(String, JSONObject)
+     */
     private JSONObject initDeviceNodeJsonForDevice() {
         JSONObject jsonObj = new JSONObject();
         putGenericDeviceNodeSegmentJson(jsonObj);
@@ -139,9 +176,11 @@ public class DeviceNodeImpl implements DeviceNode {
     }
 
     /**
-     * Builds the request {@link String} query used against mac address api.
-     * Collects Application properties to build string.
+     * Builds the request {@link String} query used against macaddress.io api.
+     * Collects Application properties to build request string.
      * @return {@link String} request.
+     *
+     * @see    Properties#load(Reader)
      */
     private String loadMKQueryStr() {
         Properties props = new Properties();
@@ -165,20 +204,22 @@ public class DeviceNodeImpl implements DeviceNode {
     /**
      * Builds request string for mac address search. Specifically injects the request
      * suffix for json response.
-     * @param apiKey : API key for 'macaddress.io' collected from application properties.
-     * @param address : Full mac address consisting of six octets.
-     * @return {@link String} request string.
+     * @param apiKey  API key for 'macaddress.io' collected from application properties.
+     * @param address Full mac address consisting of six octets.
+     * @return        {@link String} request string.
+     *
+     * @see           <a href="https://macaddress.io/api/documentation/making-requests">macaddress.io api docs</a>
      */
     private String buildMkQueryJsonRequest(String apiKey, String address) {
-        // we should only pull first 3 octets of mac address
+        // only append pull first 3 octets of device mac address
         return StringUtils.join(PeepingConstants.MAC_LOOKUP_API_URL, apiKey, PeepingConstants.MAC_LOOKUP_API_JSON_SUFFIX,
                 StringUtils.substring(address, 0, 8));
     }
 
     /**
      * Request utilizing {@link Unirest} HTTP client.
-     * @param request : String request
-     * @return {@link String} response
+     * @param request String request
+     * @return       {@link String} response
      */
     private String unirestRequest(String request) {
         HttpResponse<String> response = null;
@@ -190,6 +231,16 @@ public class DeviceNodeImpl implements DeviceNode {
         return response != null ? response.getBody() : null;
     }
 
+    /**
+     * Builds macaddress.io api endpoint request, sends unirest request {@link Unirest}
+     * and returns response data consisting of various data collected about device
+     * mac-address. Only the first 3-octets of device macaddress is appended to the request.
+     * @return {@link String}
+     * @see    #loadMKQueryStr()
+     * @see    #buildMkQueryJsonRequest(String, String)
+     * @see    #unirestRequest(String)
+     * @see    <a href="https://macaddress.io/api/documentation/making-requests">macaddress.io api docs</a>
+     */
     private String searchMacAddressAndGetResponse() {
         String key = loadMKQueryStr();
         String macAddressDataRequestStr = buildMkQueryJsonRequest(key, this.macAddress);
@@ -198,12 +249,12 @@ public class DeviceNodeImpl implements DeviceNode {
 
     /**
      * Input host node device's data in json object.
-     * @param jsonNodeObject {@link JSONObject} overall json data object.
+     * @param jsonNodeObject {@link JSONObject} overall json data object
      */
     private void putHostDeviceNodeSegmentJson(JSONObject jsonNodeObject) {
         JSONObject smartDeviceInitialDataObject = new JSONObject()
                 .put(PeepingConstants.SMART_DEVICE_NODE_TYPE, PeepingConstants.HOST)
-                .put(PeepingConstants.HOST_NAME, hostName)
+                .put(PeepingConstants.HOST_NAME, NetworkUtil.getHost())
                 .put(PeepingConstants.LOCAL_IP_ADDRESS, localIpaddress)
                 .put(PeepingConstants.EXTERNAL_IP_ADDRESS, externalIpAddress)
                 .put(PeepingConstants.MAC_ADDRESS_2, macAddress);
@@ -211,6 +262,10 @@ public class DeviceNodeImpl implements DeviceNode {
         jsonNodeObject.put(PeepingConstants.SMART_DEVICE_NODE_DETAILS, smartDeviceInitialDataObject);
     }
 
+    /**
+     * Input client node device's data in json object.
+     * @param jsonNodeObject {@link JSONObject} overall json data object
+     */
     private void putGenericDeviceNodeSegmentJson(JSONObject jsonNodeObject) {
         JSONObject genericDeviceInitialDataObject = new JSONObject()
                 .put(PeepingConstants.SMART_DEVICE_NODE_TYPE, PeepingConstants.CLIENT)
@@ -224,8 +279,8 @@ public class DeviceNodeImpl implements DeviceNode {
 
     /**
      * Inputs data from mac address search response.
-     * @param macSearchResponseBody : {@link String} search response.
-     * @param jsonNodeObject : {@link JSONObject} overall json object data.
+     * @param macSearchResponseBody {@link String} search response.
+     * @param jsonNodeObject        {@link JSONObject} overall json object data.
      */
     private void putMacSearchSegmentJson(String macSearchResponseBody, JSONObject jsonNodeObject) {
         JSONObject macSearchResponseJson = new JSONObject(macSearchResponseBody);
@@ -244,9 +299,9 @@ public class DeviceNodeImpl implements DeviceNode {
     /**
      * Puts vendor and block segment data from mac address search response to overall
      * json data object.
-     * @param dataJson : {@link JSONObject} overall json object.
-     * @param vendorJson : {@link JSONObject} vender data in json format from mac address response.
-     * @param blockJson : {@link JSONObject} block data in json format from mac address response.
+     * @param dataJson   {@link JSONObject} overall json object.
+     * @param vendorJson {@link JSONObject} vender data in json format from mac address response.
+     * @param blockJson  {@link JSONObject} block data in json format from mac address response.
      */
     private void putMACDetailsSegmentJson(JSONObject dataJson, JSONObject vendorJson, JSONObject blockJson) {
         putSegmentDetailsJson(dataJson, vendorJson, vendorKeys);
@@ -255,9 +310,9 @@ public class DeviceNodeImpl implements DeviceNode {
 
     /**
      * Puts segment detail to overall json data object.
-     * @param obj {@link JSONObject} overall json data object.
+     * @param obj        {@link JSONObject} overall json data object.
      * @param detailJson {@link JSONObject} segment json data.
-     * @param keys {@link Map} the keys for json detail object.
+     * @param keys       {@link Map} the keys for json detail object.
      */
     private void putSegmentDetailsJson(JSONObject obj, JSONObject detailJson, Map<String, String> keys) {
         keys.forEach((key, value) -> obj.put(value, detailJson.get(key).toString()));
@@ -265,9 +320,9 @@ public class DeviceNodeImpl implements DeviceNode {
 
     /**
      * Puts segment detail to overall json data object.
-     * @param obj {@link JSONObject} overall json data object.
+     * @param obj        {@link JSONObject} overall json data object.
      * @param detailJson {@link JSONObject} segment json data.
-     * @param keys {@link List} the keys for json detail object.
+     * @param keys       {@link List} the keys for json detail object.
      */
     private void putSegmentDetailsJson(JSONObject obj, JSONObject detailJson, List<String> keys) {
         keys.forEach((key) -> obj.put(key, detailJson.get(key).toString()));
@@ -275,7 +330,7 @@ public class DeviceNodeImpl implements DeviceNode {
 
     /**
      * Input operating system data to overal json object data.
-     * @param obj : {@link JSONObject} overall json object.
+     * @param obj {@link JSONObject} overall json object.
      */
     private void putOperatingSystemSegmentJson(JSONObject obj) {
         JSONObject systemJsonObj = new JSONObject()
@@ -290,8 +345,8 @@ public class DeviceNodeImpl implements DeviceNode {
 
     /**
      * Assigns and appends deeper network data segment to overall smart device json data.
-     * @param deepNetworkResponse : response from ip-check request.
-     * @param obj : overall device json data.
+     * @param deepNetworkResponse response from ip-check request.
+     * @param obj                 overall device json data.
      */
     private void putDeepNetworkSegmentJson(String deepNetworkResponse, JSONObject obj) {
         JSONObject deepNetworkResponseJson = new JSONObject(deepNetworkResponse);

@@ -2,6 +2,9 @@ package com.smart.peepingbill.models;
 
 import org.json.JSONObject;
 
+/**
+ * Defines the interface for {@link com.smart.peepingbill.models.impl.DeviceNodeImpl} class.
+ */
 public interface DeviceNode {
 
     /**
@@ -22,9 +25,19 @@ public interface DeviceNode {
     void prettyPrint();
 
     /**
-     * Void sudo.
+     * Remove and null sudo key.
      */
     void voidSudo();
 
+    /**
+     * Get Device name.
+     * @return {@link String}
+     */
+    String getDeviceName();
+
+    /**
+     * Get response from nmap os scan.
+     * @return {@link String}
+     */
     String getNmapScanResponse();
 }

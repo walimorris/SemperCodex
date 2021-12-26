@@ -11,7 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Defines the code for password validation for {@link com.smart.peepingbill.PeepingBillApplication}
+ * Defines the code for {@code com/smart/peepingbill/models/impl/PasswordImpl.java} which supplies
+ * functionalities such as password validation, password removal and creation.
+ *
+ * @author Wali Morris<walimmorris@gmail.com>
+ * created on 2021/12/26
  */
 public class PasswordImpl implements Password {
     private static final Logger LOG = LoggerFactory.getLogger(PasswordImpl.class);
@@ -48,10 +52,12 @@ public class PasswordImpl implements Password {
     }
 
     /**
+     * <p>
      * Determines if possible password contains the valid initial characteristics of a possible
      * stored password.
-     * @param password : {@link String} password
-     * @return boolean
+     * </p>
+     * @param password {@link String} password
+     * @return         boolean
      */
     private boolean validInitialPropertiesForPassword(String password) {
         return StringUtils.isNotEmpty(password) && password.length() > 10 && password.length() <= 128
@@ -59,11 +65,13 @@ public class PasswordImpl implements Password {
     }
 
     /**
+     * <p>
      * Builds password validation map that contains boolean values for each required properties a
      * password must contain for validation ands returns 'success' if these validation characters
      * exist or a message detailing which properties do not exist.
-     * @param password : {@link String} password.
-     * @return {@link String} validation message.
+     * </p>
+     * @param password {@link String} password.
+     * @return         {@link String} validation message.
      */
     private String containsValidPasswordCharacters(String password) {
         Map<String, Boolean> passwordValidationMap = new HashMap<>(Map.of(PeepingConstants.HAS_SPECIAL_CHARACTERS, Boolean.FALSE,
@@ -93,9 +101,9 @@ public class PasswordImpl implements Password {
 
     /**
      * Builds detailed validation message based on missing properties required for password validation.
-     * @param passwordValidationMap : {@link Map} which maps {@link String} required password validation
+     * @param passwordValidationMap {@link Map} which maps {@link String} required password validation
      *                              properties to a {@link Boolean} value.
-     * @return {@link String} detailed password validation message.
+     * @return                      {@link String} detailed password validation message.
      */
     private String buildValidatePasswordMessage(Map<String, Boolean> passwordValidationMap) {
         StringBuilder passwordValidationMessage = new StringBuilder();
@@ -125,9 +133,9 @@ public class PasswordImpl implements Password {
     /**
      * Password validation message helper. Helps build password validation message.
      * @param validationMessage current validation message
-     * @param message1 possible message to append to current validation message.
-     * @param message2 possible message to append to current validation message.
-     * @return {@link String} possible message appended to current validation message.
+     * @param message1          possible message to append to current validation message.
+     * @param message2          possible message to append to current validation message.
+     * @return                  {@link String} possible message appended to current validation message.
      */
     private String appendToValidationMessage(StringBuilder validationMessage, String message1, String message2 ) {
         if (StringUtils.isNotEmpty(validationMessage)) {
