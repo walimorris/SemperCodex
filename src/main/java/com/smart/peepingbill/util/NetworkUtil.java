@@ -79,6 +79,7 @@ public class NetworkUtil {
      * @return    {@link Map}
      *
      * @see      #writeDeviceMacAndIpAddresses(BufferedReader)
+     * @see      #spawnProcess(String, String)
      */
     @NotNull
     public static Map<String, String> getLanDeviceMacAndIpAddresses(String key) {
@@ -97,6 +98,7 @@ public class NetworkUtil {
      * @param key     sudo secret key
      * @return        {@link String}
      * @see           #writeDeviceScanForOsResponse(BufferedReader, String)
+     * @see           #spawnProcess(String, String)
      */
     @NotNull
     public static String scanDeviceForOS(String address, String key) {
