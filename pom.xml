@@ -166,6 +166,11 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>3.12.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>20.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
