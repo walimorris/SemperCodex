@@ -3,6 +3,7 @@ package com.smart.peepingbill.controllers;
 import com.smart.peepingbill.models.SudoPopupWindow;
 import com.smart.peepingbill.models.impl.DeviceNodeImpl;
 import com.smart.peepingbill.models.impl.SmartSystemNetworkImpl;
+import com.smart.peepingbill.models.impl.SnapShotImpl;
 import com.smart.peepingbill.models.impl.SudoPopupWindowImpl;
 import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
@@ -45,6 +46,15 @@ public class PadLandingController implements Initializable {
 
     @FXML
     private Button buildNetworkButton;
+
+    @FXML
+    private Button jsonSnapShotButton;
+
+    @FXML
+    private Button pdfSnapShotButton;
+
+    @FXML
+    private Button txtSnapShotButton;
 
     @FXML
     private VBox vboxLeft;
@@ -102,6 +112,20 @@ public class PadLandingController implements Initializable {
             }
         });
     }
+
+    @FXML
+    protected void getJsonSnapShot(ActionEvent e) {
+        if (!buildNetworkButton.isDisabled() && smartSystemNetwork != null) {
+            SnapShotImpl jsonSnapShot = new SnapShotImpl(PeepingConstants.JSON, smartSystemNetwork);
+            jsonSnapShot.writeSnapShot();
+        }
+    }
+
+    @FXML
+    protected void getPdfSnapShot(ActionEvent e) {}
+
+    @FXML
+    protected void getTxtSnapShot(ActionEvent e) {}
 
     private void resetDeviceCount() {
         deviceCount = 0;

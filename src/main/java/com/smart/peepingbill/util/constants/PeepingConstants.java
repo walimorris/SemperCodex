@@ -133,6 +133,7 @@ public final class PeepingConstants {
     // operating system constants
     public static final String SMART_DEVICE_SYSTEM_PROPERTIES = "smartDeviceSystemProperties";
     public static final String OPERATING_SYSTEM_PROPERTY = "os.name";
+    public static final String SYSTEM_USER_HOME = "user.home";
     public static final String OPERATING_SYSTEM_ARCHITECTURE_PROPERTY = "os.arch";
     public static final String SYSTEM_LANGUAGE = "user.language";
     public static final String OPERATING_SYSTEM_VERSION = "os.version";
@@ -159,6 +160,17 @@ public final class PeepingConstants {
     public static final String NMAP_DEVICE_SCAN_FOR_OS = "sudo nmap -Pn -v -O";
     public static final String NMAP_CONTAINS_PORT_STATE_SERVICE = "port_state-service";
 
+    // SnapShot file constants
+    public static final String CODEX_SNAP_SHOT_DIRECTORY = "/CodexSnapShots";
+    public static final String CODEX_SNAP_SHOT_JSON_DIRECTORY = "/JSONSnapShots";
+    public static final String CODEX_SNAP_SHOT_PDF_DIRECTORY = "/PDFSnapsShots";
+    public static final String CODEX_SNAP_SHOT_TXT_DIRECTORY = "/TXTSnapsShots";
+    public static final String JSON_FILE_TYPE = ".json";
+    public static final String PDF_FILE_TYPE = ".pdf";
+    public static final String TXT_FILE_TYPE = ".txt";
+    public static final String JSON = "json";
+    public static final String PDF = "pdf";
+    public static final String TXT = "txt";
 
     /**
      * Prevents native class from calling this constructor. The caller references constants using

@@ -14,6 +14,8 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,8 +25,8 @@ import java.util.Objects;
  * Defines the code for {@code com/smart/peepingbill/util/NetworkUtil.java}. The NetworkUtil consists
  * of various operations used for receiving, passing or commanding network data. Contains helper
  * functions that can be used throughout the application code base to ease the use of network
- * functionality. A simple use case is utilizing the java.net {@link Inet4Address} package to obtain
- * network host and ip-address.
+ * functionality. This includes functionality towards the local host's file system. A simple use case
+ * is utilizing the java.net {@link Inet4Address} package to obtain network host and ip-address.
  * </p>
  *
  * @author Wali Morris<walimmorris@gmaill.com>
@@ -69,6 +71,31 @@ public class NetworkUtil {
             LOG.error("Error requesting local host name: {}", e.getMessage());
         }
         return host;
+    }
+
+    /**
+     * Utilizes System properties to return user's home directory.
+     * @return {@link String}
+     */
+    @Nullable
+    public static String getUserHomeDirectory() {
+        return System.getProperty(PeepingConstants.SYSTEM_USER_HOME);
+    }
+
+    /**
+     * Get system local date.
+     * @return {@link String}
+     */
+    public static String getSystemLocalDate() {
+        return LocalDate.now().toString();
+    }
+
+    /**
+     * Get system local time.
+     * @return {@link String}
+     */
+    public static String getSystemLocalTime() {
+        return LocalTime.now().toString().substring(0, 8);
     }
 
     /**
