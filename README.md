@@ -1,6 +1,6 @@
-#Semper Codex
+# Semper Codex
 ***
-##Introduction
+## Introduction
 ***
 Information, data, and systems are connected more today than ever, but the data itself is still very much the star
 of the show. Data tells stories and gives answers. It can also be used in malicious ways. Computer users, both 
@@ -24,9 +24,9 @@ How? We provide features such as saving the JSON representation of your data loc
 a user interface which paints a visual representation of your network using the famous [JavaFx Application Platform](https://openjfx.io/), 
 sharing your network and its devices' data in real time - only accessible to you locally. 
 
-###System Network JSON Example
+### System Network JSON Example
 ***
-The following is an example of your LAN and its devices' data stored represented as JSON: 
+The following is an example of your LAN and its devices' data represented as JSON: 
 ```json
 {
   "hostSmartNode": {
