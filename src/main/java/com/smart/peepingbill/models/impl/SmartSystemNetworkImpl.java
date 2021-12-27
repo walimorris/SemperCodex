@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
  * @author Wali Morris<walimmorris@gmail.com>
  * created on 2021/12/25
  *
- * @see <a href="https://javadox.com/org.json/json/20151123/org/json/JSONObject.html">JSONObject Java docs</a>
+ * @see <a href="https://www.javadoc.io/doc/org.json/json/latest/org/json/class-use/JSONObject.html">JSONObject Java docs</a>
  */
 public class SmartSystemNetworkImpl implements SmartSystemNetwork {
     private static final Logger LOG = LoggerFactory.getLogger(SmartSystemNetworkImpl.class);
@@ -94,7 +94,7 @@ public class SmartSystemNetworkImpl implements SmartSystemNetwork {
      * @param unorderedJSON {@link JSONObject}
      *
      * @see java.lang.reflect.AccessibleObject
-     * @see <a href="https://javadox.com/org.json/json/20151123/org/json/JSONObject.html">JSONObject Java docs</a>
+     * @see <a href="https://www.javadoc.io/doc/org.json/json/latest/org/json/class-use/JSONObject.html">JSONObject Java docs</a>
      */
     private void createOrderedJSONObjectByReflection(@NotNull JSONObject unorderedJSON) {
         try {
