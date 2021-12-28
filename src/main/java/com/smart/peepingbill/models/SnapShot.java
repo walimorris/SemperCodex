@@ -32,24 +32,6 @@ public interface SnapShot {
     String getCodexSnapShotDirectoryPath();
 
     /**
-     * Get path to codex snapshot json directory.
-     * @return {@link String}
-     */
-    String getCodexSnapShotJsonDirectoryPath();
-
-    /**
-     * Get path to codex snapshot pdf directory.
-     * @return {@link String}
-     */
-    String getCodexSnapShotPdfDirectoryPath();
-
-    /**
-     * Get path to codex snapshot txt directory.
-     * @return {@link String}
-     */
-    String getCodexSnapShotTxtDirectoryPath();
-
-    /**
      * Writes snapshot to filesystem.
      */
     void writeSnapShot();

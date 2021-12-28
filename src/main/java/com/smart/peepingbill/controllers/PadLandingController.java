@@ -51,12 +51,6 @@ public class PadLandingController implements Initializable {
     private Button jsonSnapShotButton;
 
     @FXML
-    private Button pdfSnapShotButton;
-
-    @FXML
-    private Button txtSnapShotButton;
-
-    @FXML
     private VBox vboxLeft;
 
     @FXML
@@ -81,6 +75,9 @@ public class PadLandingController implements Initializable {
     private SudoPopupWindow sudoPopupWindow;
     private Stage currentStage;
     private SmartSystemNetworkImpl smartSystemNetwork;
+
+    // snapshots
+    SnapShotImpl jsonSnapShot;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -115,17 +112,24 @@ public class PadLandingController implements Initializable {
 
     @FXML
     protected void getJsonSnapShot(ActionEvent e) {
-        if (!buildNetworkButton.isDisabled() && smartSystemNetwork != null) {
-            SnapShotImpl jsonSnapShot = new SnapShotImpl(PeepingConstants.JSON, smartSystemNetwork);
+        if (isSnapShotAvailable() && jsonSnapShot == null) {
+            jsonSnapShot = new SnapShotImpl(PeepingConstants.JSON, smartSystemNetwork);
             jsonSnapShot.writeSnapShot();
+        } else {
+            if (isSnapShotAvailable() && jsonSnapShot != null) {
+                jsonSnapShot.writeSnapShot();
+            }
         }
     }
 
-    @FXML
-    protected void getPdfSnapShot(ActionEvent e) {}
-
-    @FXML
-    protected void getTxtSnapShot(ActionEvent e) {}
+    /**
+     * Returns if taking a CodexSnapShot is available by determining if system network build
+     * button is enabled and smartSystemNetwork {@link JSONObject} is created and not null.
+     * @return boolean is CodexSnapShot available
+     */
+    private boolean isSnapShotAvailable() {
+        return !buildNetworkButton.isDisabled() && smartSystemNetwork != null;
+    }
 
     private void resetDeviceCount() {
         deviceCount = 0;

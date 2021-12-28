@@ -16,8 +16,6 @@
             <Label fx:id="smartNetworkTabLabel" text="Smart System Network"/>
             <Button fx:id="buildNetworkButton" text="Build" onAction="#onBuildNetworkButtonClick"/>
             <Button fx:id="jsonSnapShotButton" text="JSON Snap" onAction="#getJsonSnapShot"/>
-            <Button fx:id="pdfSnapShotButton" text="PDF Snap" onAction="#getPdfSnapShot"/>
-            <Button fx:id="txtSnapShotButton" text="Txt Snap" onAction="#getTxtSnapShot"/>
         </VBox>
     </left>
     <center>

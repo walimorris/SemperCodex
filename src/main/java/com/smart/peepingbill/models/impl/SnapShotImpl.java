@@ -3,7 +3,7 @@ package com.smart.peepingbill.models.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.smart.peepingbill.models.SnapShot;
-import com.smart.peepingbill.util.NetworkUtil;
+import com.smart.peepingbill.util.FileUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Defines the code for {@code com/smart/peepingbill/models/impl/SnapShotImpl.java} class.
@@ -33,15 +32,11 @@ public class SnapShotImpl implements SnapShot {
     private final SmartSystemNetworkImpl systemJson;
     private boolean snapShotDirExists;
     private final Path codexSnapShotDirectory;
-    private Path codexSnapShotJsonDirectory;
-    private Path codexSnapShotPdfDirectory;
-    private Path codexSnapShotTxtDirectory;
 
     public SnapShotImpl(String fileType, SmartSystemNetworkImpl systemJson) {
         this.fileType = fileType;
         this.systemJson = systemJson;
-        this.codexSnapShotDirectory = Paths.get(StringUtils.join(NetworkUtil.getUserHomeDirectory(),
-                PeepingConstants.CODEX_SNAP_SHOT_DIRECTORY));
+        this.codexSnapShotDirectory = FileUtil.getCodexSnapShotDirectory();
 
         this.snapShotDirExists = codexSnapDirExists();
     }
@@ -62,37 +57,32 @@ public class SnapShotImpl implements SnapShot {
     }
 
     @Override
-    public String getCodexSnapShotJsonDirectoryPath() {
-        return codexSnapShotJsonDirectory.toString();
-    }
-
-    @Override
-    public String getCodexSnapShotPdfDirectoryPath() {
-        return codexSnapShotPdfDirectory.toString();
-    }
-
-    @Override
-    public String getCodexSnapShotTxtDirectoryPath() {
-        return codexSnapShotTxtDirectory.toString();
-    }
-
-    @Override
     public boolean getCodexSnapShotDirExists() {
         return snapShotDirExists;
     }
 
     @Override
     public void writeSnapShot() {
+        if (fileType.equalsIgnoreCase(PeepingConstants.JSON)) {
+            initJsonSnapShotTask();
+        }
+    }
+
+    /**
+     * Initializes a {@link Task} to create a .json file of the current system network as
+     * a {@link org.json.JSONObject}.
+     */
+    public void initJsonSnapShotTask() {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                String filePrefix = StringUtils.join(NetworkUtil.getSystemLocalDate(), "_", NetworkUtil.getSystemLocalTime());
-                Path fileName = Path.of(StringUtils.join(getCodexSnapShotJsonDirectoryPath(), "/", filePrefix,
+                String filePrefix = FileUtil.getSnapShotFilePrefix();
+                Path fileName = Path.of(StringUtils.join(FileUtil.getCodexSnapShotJsonDirectory(), "/", filePrefix,
                         PeepingConstants.JSON_FILE_TYPE));
                 try {
                     Files.writeString(fileName, prettyPrintSystemJSON());
                 } catch (IOException e) {
-                    LOG.error("Error writing json snapshot to file: {}", e.getMessage());
+                    LOG.error("Error writing json snapshot to file '{}': {}", fileName, e.getMessage());
                 }
                 LOG.info("{} written to system", fileName);
                 return null;
@@ -103,8 +93,7 @@ public class SnapShotImpl implements SnapShot {
 
     /**
      * The <b>user/home/CodexSnapShots</b> directory is checked for existence. If it does not exist,
-     * it is created along with the <b>/user/home/CodexSnapShots/JSONSnapShots,
-     * /user/home/CodexSnapShots/PDFSnapShots, /user/home/CodexSnapShots/TXTSnapShots</b> directories.
+     * it is created along with the <b>/user/home/CodexSnapShots/JSONSnapShots</b> directory.
      * @return boolean
      */
     private boolean codexSnapDirExists() {
@@ -116,16 +105,7 @@ public class SnapShotImpl implements SnapShot {
             try {
                 Files.createDirectory(codexSnapShotDirectory);
                 // create json snap directory
-                this.codexSnapShotJsonDirectory = Paths.get(StringUtils.join(codexSnapShotDirectory.toString(), PeepingConstants.CODEX_SNAP_SHOT_JSON_DIRECTORY));
-                Files.createDirectory(codexSnapShotJsonDirectory);
-
-                // create pdf directory
-                this.codexSnapShotPdfDirectory = Paths.get(StringUtils.join(codexSnapShotDirectory.toString(), PeepingConstants.CODEX_SNAP_SHOT_PDF_DIRECTORY));
-                Files.createDirectory(codexSnapShotPdfDirectory);
-
-                // create txt directory
-                this.codexSnapShotTxtDirectory = Paths.get(StringUtils.join(codexSnapShotDirectory.toString(), PeepingConstants.CODEX_SNAP_SHOT_TXT_DIRECTORY));
-                Files.createDirectory(codexSnapShotTxtDirectory);
+                Files.createDirectory(FileUtil.getCodexSnapShotJsonDirectory());
             } catch (IOException e) {
                 LOG.error("Error creating Codex SnapShot Directories: {}", e.getMessage());
                 return false;

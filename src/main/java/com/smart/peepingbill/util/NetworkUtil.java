@@ -25,8 +25,8 @@ import java.util.Objects;
  * Defines the code for {@code com/smart/peepingbill/util/NetworkUtil.java}. The NetworkUtil consists
  * of various operations used for receiving, passing or commanding network data. Contains helper
  * functions that can be used throughout the application code base to ease the use of network
- * functionality. This includes functionality towards the local host's file system. A simple use case
- * is utilizing the java.net {@link Inet4Address} package to obtain network host and ip-address.
+ * functionality. A simple use case is utilizing the java.net {@link Inet4Address} package to obtain
+ * network host and ip-address.
  * </p>
  *
  * @author Wali Morris<walimmorris@gmaill.com>
@@ -71,15 +71,6 @@ public class NetworkUtil {
             LOG.error("Error requesting local host name: {}", e.getMessage());
         }
         return host;
-    }
-
-    /**
-     * Utilizes System properties to return user's home directory.
-     * @return {@link String}
-     */
-    @Nullable
-    public static String getUserHomeDirectory() {
-        return System.getProperty(PeepingConstants.SYSTEM_USER_HOME);
     }
 
     /**
