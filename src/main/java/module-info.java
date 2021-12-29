@@ -22,7 +22,6 @@ module com.smart.peepingbill {
     requires unirest.java;
     requires javax.inject;
     requires org.jetbrains.annotations;
-    requires itextpdf;
 
     opens com.smart.peepingbill to javafx.fxml;
     exports com.smart.peepingbill;
