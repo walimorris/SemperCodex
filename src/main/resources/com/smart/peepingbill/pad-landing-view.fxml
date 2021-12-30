@@ -9,16 +9,19 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.smart.peepingbill.controllers.PadLandingController">
     <stylesheets>
-        <URL value="@peepingStyles.css" />
+        <URL value="@stylesheets/pad-landing-view-style.css" />
     </stylesheets>
     <left>
         <VBox fx:id="vboxLeft">
             <Label fx:id="smartNetworkTabLabel" text="Smart System Network"/>
             <Button fx:id="buildNetworkButton" text="Build" onAction="#onBuildNetworkButtonClick"/>
-            <Button fx:id="jsonSnapShotButton" text="JSON Snap" onAction="#getJsonSnapShot"/>
+            <Button fx:id="jsonSnapShotButton" text="JSON Snap Shot" onAction="#getJsonSnapShot"/>
         </VBox>
     </left>
     <center>
         <GridPane fx:id="gridpaneCenter"/>
     </center>
+    <bottom>
+        <VBox fx:id="vboxBottom"/>
+    </bottom>
 </BorderPane>

@@ -12,4 +12,24 @@ public interface SmartSystemNetwork {
      * @return {@link JSONObject}
      */
     JSONObject getSmartSystemJSON();
+
+    JSONObject getSmartSystemHostNode();
+
+    JSONObject getSmartSystemHostNodeDetails();
+
+    String getSmartSystemHostName();
+
+    String getSmartSystemHostMacAddress();
+
+    String getSmartSystemHostExternalIpaddress();
+
+    String getSmartSystemHostLocalIpaddress();
+
+    JSONObject getSmartSystemDeviceNode(int device);
+
+    JSONObject getSmartSystemDeviceNodeDetails(int device);
+
+    String getSmartSystemDeviceNodeMacAddress(int device);
+
+    String getSmartSystemDeviceNodeLocalIpAddress(int device);
 }

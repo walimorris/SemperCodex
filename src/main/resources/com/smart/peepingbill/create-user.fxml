@@ -9,10 +9,10 @@
 <?import javafx.scene.control.Label?>
 <?import java.net.URL?>
 <?import javafx.scene.layout.BorderPane?>
-<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="createUserPortal" alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.smart.peepingbill.controllers.CreateUserController">
     <stylesheets>
-        <URL value="@peepingStyles.css" />
+        <URL value="@stylesheets/create-user-view-styles.css" />
     </stylesheets>
     <padding>
         <Insets bottom="20.0"/>
@@ -21,7 +21,7 @@
         <top>
             <BorderPane styleClass="topHeader">
                 <left>
-                    <Label id="headerText" text="Peeping B!ll"/>
+                    <Label id="headerText" text="Create User"/>
                 </left>
                 <right>
                     <Button fx:id="helpButton" text="Help"/>

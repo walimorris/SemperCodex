@@ -9,6 +9,7 @@ import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,6 +22,8 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Defines the code for {@code com/smart/peepingbill/pad-landingp-view.fxml}. The pad-landing view
@@ -54,6 +58,9 @@ public class PadLandingController implements Initializable {
     private VBox vboxLeft;
 
     @FXML
+    private VBox vboxBottom;
+
+    @FXML
     private GridPane gridpaneCenter;
 
     @FXML
@@ -70,6 +77,7 @@ public class PadLandingController implements Initializable {
 
     private boolean is3DSupported;
     private int deviceCount;
+    private boolean isNetworkUiRendered;
     private String[] ipHostArray;
     private Map<String, String> macAddresses;
     private SudoPopupWindow sudoPopupWindow;
@@ -82,6 +90,7 @@ public class PadLandingController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         sudo = new PasswordField();
+        isNetworkUiRendered = false;
         deviceCount = 0;
         popupSubmit = new Button(PeepingConstants.SUBMIT);
         is3DSupported = Platform.isSupported(ConditionalFeature.SCENE3D);
@@ -104,8 +113,6 @@ public class PadLandingController implements Initializable {
 
             if (sudoPopupWindow.isSudoSet()) {
                 initBuildSmartSystemJsonData();
-
-                // build 2d smart system network ui
             }
         });
     }
@@ -240,8 +247,6 @@ public class PadLandingController implements Initializable {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                // disable build-network ui button while task is in progress
-                buildNetworkButton.setDisable(true);
 
                 ipHostArray = new String[]{NetworkUtil.getIpaddress(), NetworkUtil.getHost()};
                 macAddresses = NetworkUtil.getLanDeviceMacAndIpAddresses(sudoPopupWindow.getSudo());
@@ -255,11 +260,98 @@ public class PadLandingController implements Initializable {
         // bind progress bar to task, disable build-network button while in process
         // enable build-network button once task complete
         bar.progressProperty().bind(task.progressProperty());
-        task.setOnRunning(workerStateEvent -> buildNetworkButton.setDisable(true));
+        task.setOnRunning(workerStateEvent -> {
+            // disable build-network ui button while task is in progress
+            disableBuildNetworkButton();
+            disableJsonSnapShotButton();
+            disableGridPaneCenter();
+
+            ChangeListener<SmartSystemNetworkImpl> systemListener = (observableValue, smartSystem, t1) -> {
+                LOG.info("Smart System Network data change.");
+                AtomicInteger row = new AtomicInteger(0);
+                AtomicInteger column = new AtomicInteger(0);
+                // build host smart node visual
+                Circle hostNode = new Circle(150.0f, 67.5f, 50.0f);
+                hostNode.setFill(Color.web("#20c20e"));
+                gridpaneCenter.setGridLinesVisible(true);
+                gridpaneCenter.add(hostNode, column.get(), row.get());
+                column.getAndIncrement();
+
+                // gridpane is disabled until task completion, this sets mouseevent for device nodes
+                // once task is complete and system network json is fully built.
+                hostNode.setOnMouseClicked(mouseEvent -> {
+                    int size = smartSystemNetwork.getSmartSystemJSON().length() - 1;
+
+                    // when clicked build host node info in VboxBottom
+                    Label hostname = new Label(smartSystemNetwork.getSmartSystemHostName());
+                    Label macaddress = new Label(smartSystemNetwork.getSmartSystemHostMacAddress());
+                    Label externalIp = new Label(smartSystemNetwork.getSmartSystemHostExternalIpaddress());
+                    Label internalIp = new Label(smartSystemNetwork.getSmartSystemHostLocalIpaddress());
+
+                    if (vboxBottom.getChildren().size() > 0) {
+                        vboxBottom.getChildren().clear();
+                    }
+                    vboxBottom.getChildren().addAll(hostname, macaddress, externalIp, internalIp);
+
+                    for (int i = 0; i < size; i++) {
+                        Circle deviceNode = new Circle(75.0f, 33.75f, 25.0f);
+                        deviceNode.setFill(Color.web("#20c20e"));
+                        if (column.get() == 4) {
+                            column.set(0);
+                            row.getAndIncrement();
+                        }
+                        gridpaneCenter.add(deviceNode, column.get(), row.get());
+                        column.getAndIncrement();
+
+                        int finalI = i;
+                        deviceNode.setOnMouseClicked(event -> {
+                            Label devicename = new Label(PeepingConstants.DEVICE_SMART_NODE + finalI);
+                            Label deviceMacaddress = new Label(smartSystemNetwork.getSmartSystemDeviceNodeMacAddress(finalI));
+                            Label deviceInternalIp = new Label(smartSystemNetwork.getSmartSystemDeviceNodeLocalIpAddress(finalI));
+
+                            if (vboxBottom.getChildren().size() > 0) {
+                                vboxBottom.getChildren().clear();
+                            }
+                            vboxBottom.getChildren().addAll(devicename, deviceMacaddress, deviceInternalIp);
+                        });
+
+                    }
+                });
+            };
+            systemListener.changed(null, null, smartSystemNetwork);
+            isNetworkUiRendered = true;
+        });
+
         task.setOnSucceeded(workerStateEvent -> {
             gridpaneCenter.getChildren().remove(bar);
-            buildNetworkButton.setDisable(false);
+            enableBuildNetworkButton();
+            enableJsonSnapShotButton();
+            enableGridPaneCenter();
         });
         new Thread(task).start();
+    }
+
+    private void disableBuildNetworkButton() {
+        buildNetworkButton.setDisable(true);
+    }
+
+    private void enableBuildNetworkButton() {
+        buildNetworkButton.setDisable(false);
+    }
+
+    private void disableJsonSnapShotButton() {
+        jsonSnapShotButton.setDisable(true);
+    }
+
+    private void enableJsonSnapShotButton() {
+        jsonSnapShotButton.setDisable(false);
+    }
+
+    private void disableGridPaneCenter() {
+        gridpaneCenter.setDisable(true);
+    }
+
+    private void enableGridPaneCenter() {
+        gridpaneCenter.setDisable(false);
     }
 }

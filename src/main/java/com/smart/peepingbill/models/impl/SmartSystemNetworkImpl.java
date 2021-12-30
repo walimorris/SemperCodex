@@ -45,6 +45,56 @@ public class SmartSystemNetworkImpl implements SmartSystemNetwork {
         return this.smartSystemJson;
     }
 
+    @Override
+    public JSONObject getSmartSystemHostNode() {
+        return smartSystemJson.getJSONObject(PeepingConstants.HOST_SMART_NODE);
+    }
+
+    @Override
+    public JSONObject getSmartSystemHostNodeDetails() {
+        return getSmartSystemHostNode().getJSONObject(PeepingConstants.SMART_DEVICE_NODE_DETAILS);
+    }
+
+    @Override
+    public String getSmartSystemHostName() {
+        return getSmartSystemHostNodeDetails().get(PeepingConstants.HOST_NAME).toString();
+    }
+
+    @Override
+    public String getSmartSystemHostMacAddress() {
+        return getSmartSystemHostNodeDetails().get(PeepingConstants.MAC_ADDRESS_2).toString();
+    }
+
+    @Override
+    public String getSmartSystemHostExternalIpaddress() {
+        return getSmartSystemHostNodeDetails().get(PeepingConstants.EXTERNAL_IP_ADDRESS).toString();
+    }
+
+    @Override
+    public String getSmartSystemHostLocalIpaddress() {
+        return getSmartSystemHostNodeDetails().get(PeepingConstants.LOCAL_IP_ADDRESS).toString();
+    }
+
+    @Override
+    public JSONObject getSmartSystemDeviceNode(int device) {
+        return smartSystemJson.getJSONObject(PeepingConstants.DEVICE_SMART_NODE + device);
+    }
+
+    @Override
+    public JSONObject getSmartSystemDeviceNodeDetails(int device) {
+        return getSmartSystemDeviceNode(device).getJSONObject(PeepingConstants.SMART_DEVICE_NODE_DETAILS);
+    }
+
+    @Override
+    public String getSmartSystemDeviceNodeMacAddress(int device) {
+        return getSmartSystemDeviceNodeDetails(device).optString(PeepingConstants.MAC_ADDRESS_2);
+    }
+
+    @Override
+    public String getSmartSystemDeviceNodeLocalIpAddress(int device) {
+        return getSmartSystemDeviceNodeDetails(device).optString(PeepingConstants.LOCAL_IP_ADDRESS);
+    }
+
     /**
      * <p>
      * Orders System json based on device, host will be the first object in the json structure and then

@@ -1,0 +1,71 @@
+/* Style sheet for login-view.fxml */
+
+.loginPortal {
+    -fx-background-color: #000;
+}
+
+.topHeader {
+    -fx-padding: 10px;
+    -fx-font-size: 20px;
+    -fx-background-color: #000;
+}
+
+#headerText {
+    -fx-text-fill: #20c20e;
+    -fx-padding: 10px;
+}
+
+#helpButton {
+    -fx-background-color: transparent;
+    -fx-text-fill: #20c20e;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+#helpButton:hover {
+    -fx-font-weight: bold;
+}
+
+#user {
+    -fx-border-color: #20c20e;
+    -fx-border-width: 5px;
+    -fx-background-color: #000;
+    -fx-text-fill: #20c20e;
+    -fx-prompt-text-fill: #20c20e;
+    -fx-padding: 10px;
+}
+
+#password {
+    -fx-border-color: #20c20e;
+    -fx-border-width: 5px;
+    -fx-background-color: #000;
+    -fx-text-fill: #20c20e;
+    -fx-prompt-text-fill: #20c20e;
+    -fx-padding: 10px;
+}
+
+#loginButton {
+    -fx-border-color: #20c20e;
+    -fx-border-width: 5px;
+    -fx-background-color: #000;
+    -fx-text-fill: #20c20e;
+}
+
+#loginButton:hover {
+    -fx-font-weight: bold;
+}
+
+#newUserButton {
+    -fx-border-color: #20c20e;
+    -fx-border-width: 5px;
+    -fx-background-color: #000;
+    -fx-text-fill: #20c20e;
+}
+
+#newUserButton:hover {
+    -fx-font-weight: bold;
+}
+
+#loginMessage {
+    -fx-text-fill: #20c20e;
+}
