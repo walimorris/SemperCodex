@@ -1,10 +1,7 @@
 package com.smart.peepingbill.controllers;
 
 import com.smart.peepingbill.models.SudoPopupWindow;
-import com.smart.peepingbill.models.impl.DeviceNodeImpl;
-import com.smart.peepingbill.models.impl.SmartSystemNetworkImpl;
-import com.smart.peepingbill.models.impl.SnapShotImpl;
-import com.smart.peepingbill.models.impl.SudoPopupWindowImpl;
+import com.smart.peepingbill.models.impl.*;
 import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.application.ConditionalFeature;
@@ -22,7 +19,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
@@ -173,14 +169,14 @@ public class PadLandingController implements Initializable {
      * <p>
      * The underlying data-structure which holds the data for each device on a user's local area
      * network is held within a {@link JSONObject}. As the system network data-structure is
-     * constructed, each device is represented and created as a device node {@link DeviceNodeImpl}
+     * constructed, each device is represented and created as a device node {@link DeviceJsonImpl}
      * with its json data appended to the single json object. This json object and its data
      * is then passed to a smart system network object {@link SmartSystemNetworkImpl} that finalizes
      * the system network build.
      * </p>
      *
      * @param sudo secret key from {@link SudoPopupWindowImpl}
-     * @see        DeviceNodeImpl
+     * @see        DeviceJsonImpl
      * @see        SmartSystemNetworkImpl
      */
     private void parseSmartSystemNetworkJsonData(String sudo) {
@@ -203,7 +199,7 @@ public class PadLandingController implements Initializable {
 
     /**
      * <p>
-     * Adds a {@link DeviceNodeImpl} device to the given smart system json object which will then be passed
+     * Adds a {@link DeviceJsonImpl} device to the given smart system json object which will then be passed
      * to the final {@link SmartSystemNetworkImpl} that builds a {@link JSONObject} representing the local
      * area network consisting of all devices and its data.
      * </p>
@@ -211,17 +207,17 @@ public class PadLandingController implements Initializable {
      * @param ipaddress             the device ip-address
      * @param mac                   the device mac-address
      * @param key                   the secret key to run system commands
-     * @param isHost                determines if the {@link DeviceNodeImpl} being created is a host or not
+     * @param isHost                determines if the {@link DeviceJsonImpl} being created is a host or not
      * @param smartSystemJsonObject the smart system json object that'll be passed to the
      *                              finalizing {@link SmartSystemNetworkImpl} object
      *
-     * @see DeviceNodeImpl#getNmapScanResponse()
+     * @see DeviceJsonImpl#getNmapScanResponse()
      * @see JSONObject
      * @see SmartSystemNetworkImpl
      */
     private void initDeviceNode(String deviceName, String ipaddress, String mac, String key, boolean isHost,
                                          JSONObject smartSystemJsonObject) {
-        DeviceNodeImpl node = new DeviceNodeImpl(deviceName, ipaddress, mac, key, isHost);
+        DeviceJsonImpl node = new DeviceJsonImpl(deviceName, ipaddress, mac, key, isHost);
         System.out.println(node.getNmapScanResponse());
         if (isHost) {
             smartSystemJsonObject.put(PeepingConstants.HOST_SMART_NODE, node.getSmartDeviceJsonObject());
@@ -256,77 +252,18 @@ public class PadLandingController implements Initializable {
                 return null;
             }
         };
-
-        // bind progress bar to task, disable build-network button while in process
-        // enable build-network button once task complete
         bar.progressProperty().bind(task.progressProperty());
         task.setOnRunning(workerStateEvent -> {
-            // disable build-network ui button while task is in progress
-            disableBuildNetworkButton();
-            disableJsonSnapShotButton();
-            disableGridPaneCenter();
-
-            ChangeListener<SmartSystemNetworkImpl> systemListener = (observableValue, smartSystem, t1) -> {
-                LOG.info("Smart System Network data change.");
-                AtomicInteger row = new AtomicInteger(0);
-                AtomicInteger column = new AtomicInteger(0);
-                // build host smart node visual
-                Circle hostNode = new Circle(150.0f, 67.5f, 50.0f);
-                hostNode.setFill(Color.web("#20c20e"));
-                gridpaneCenter.setGridLinesVisible(true);
-                gridpaneCenter.add(hostNode, column.get(), row.get());
-                column.getAndIncrement();
-
-                // gridpane is disabled until task completion, this sets mouseevent for device nodes
-                // once task is complete and system network json is fully built.
-                hostNode.setOnMouseClicked(mouseEvent -> {
-                    int size = smartSystemNetwork.getSmartSystemJSON().length() - 1;
-
-                    // when clicked build host node info in VboxBottom
-                    Label hostname = new Label(smartSystemNetwork.getSmartSystemHostName());
-                    Label macaddress = new Label(smartSystemNetwork.getSmartSystemHostMacAddress());
-                    Label externalIp = new Label(smartSystemNetwork.getSmartSystemHostExternalIpaddress());
-                    Label internalIp = new Label(smartSystemNetwork.getSmartSystemHostLocalIpaddress());
-
-                    if (vboxBottom.getChildren().size() > 0) {
-                        vboxBottom.getChildren().clear();
-                    }
-                    vboxBottom.getChildren().addAll(hostname, macaddress, externalIp, internalIp);
-
-                    for (int i = 0; i < size; i++) {
-                        Circle deviceNode = new Circle(75.0f, 33.75f, 25.0f);
-                        deviceNode.setFill(Color.web("#20c20e"));
-                        if (column.get() == 4) {
-                            column.set(0);
-                            row.getAndIncrement();
-                        }
-                        gridpaneCenter.add(deviceNode, column.get(), row.get());
-                        column.getAndIncrement();
-
-                        int finalI = i;
-                        deviceNode.setOnMouseClicked(event -> {
-                            Label devicename = new Label(PeepingConstants.DEVICE_SMART_NODE + finalI);
-                            Label deviceMacaddress = new Label(smartSystemNetwork.getSmartSystemDeviceNodeMacAddress(finalI));
-                            Label deviceInternalIp = new Label(smartSystemNetwork.getSmartSystemDeviceNodeLocalIpAddress(finalI));
-
-                            if (vboxBottom.getChildren().size() > 0) {
-                                vboxBottom.getChildren().clear();
-                            }
-                            vboxBottom.getChildren().addAll(devicename, deviceMacaddress, deviceInternalIp);
-                        });
-
-                    }
-                });
-            };
-            systemListener.changed(null, null, smartSystemNetwork);
-            isNetworkUiRendered = true;
+            disableUI();
         });
-
         task.setOnSucceeded(workerStateEvent -> {
             gridpaneCenter.getChildren().remove(bar);
-            enableBuildNetworkButton();
-            enableJsonSnapShotButton();
-            enableGridPaneCenter();
+            enableUI();
+            // build host smart node visual
+            Circle hostNode = new Circle(150.0f, 67.5f, 50.0f);
+            HostNodeImpl host = new HostNodeImpl(hostNode, vboxBottom, smartSystemNetwork, 1, 0, gridpaneCenter);
+            gridpaneCenter.setGridLinesVisible(true);
+            gridpaneCenter.add(host.getNode(), 0, 0);
         });
         new Thread(task).start();
     }
@@ -353,5 +290,17 @@ public class PadLandingController implements Initializable {
 
     private void enableGridPaneCenter() {
         gridpaneCenter.setDisable(false);
+    }
+
+    private void disableUI() {
+        disableGridPaneCenter();
+        disableJsonSnapShotButton();
+        disableBuildNetworkButton();
+    }
+
+    private void enableUI() {
+        enableGridPaneCenter();
+        enableJsonSnapShotButton();
+        enableBuildNetworkButton();
     }
 }

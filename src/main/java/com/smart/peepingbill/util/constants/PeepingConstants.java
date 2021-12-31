@@ -172,6 +172,9 @@ public final class PeepingConstants {
     public static final String PDF = "pdf";
     public static final String TXT = "txt";
 
+    // ui renditions
+    public static final String HACKER_GREEN = "#20c20e";
+
     /**
      * Prevents native class from calling this constructor. The caller references constants using
      * <tt>PeepingConstants.SUCCESS</tt> etc.
