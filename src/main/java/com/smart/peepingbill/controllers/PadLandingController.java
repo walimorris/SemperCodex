@@ -11,15 +11,21 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Defines the code for {@code com/smart/peepingbill/pad-landingp-view.fxml}. The pad-landing view
@@ -78,6 +83,7 @@ public class PadLandingController implements Initializable {
     private Map<String, String> macAddresses;
     private SudoPopupWindow sudoPopupWindow;
     private Stage currentStage;
+    private Scene currentScene;
     private SmartSystemNetworkImpl smartSystemNetwork;
 
     // snapshots
@@ -99,6 +105,8 @@ public class PadLandingController implements Initializable {
         }
 
         currentStage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+        currentScene = buildNetworkButton.getScene();
+
         sudoPopupWindow = new SudoPopupWindowImpl(currentStage, sudo, popupSubmit);
 
         sudoPopupWindow.popup();
@@ -146,6 +154,14 @@ public class PadLandingController implements Initializable {
     private Stage getCurrentStage() {
         if (currentStage != null) {
             return currentStage;
+        }
+        return null;
+    }
+
+    @Nullable
+    private Scene getCurrentScene() {
+        if (currentScene != null) {
+            return currentScene;
         }
         return null;
     }
@@ -238,7 +254,10 @@ public class PadLandingController implements Initializable {
      */
     public void initBuildSmartSystemJsonData() {
         ProgressBar bar = new ProgressBar();
-        gridpaneCenter.getChildren().add(bar);
+        Label progressbarLabel = new Label();
+
+        setProgressLabelProperties(progressbarLabel);
+        setProgressBarInVBoxBottom(bar, progressbarLabel);
 
         Task<Void> task = new Task<>() {
             @Override
@@ -246,7 +265,6 @@ public class PadLandingController implements Initializable {
 
                 ipHostArray = new String[]{NetworkUtil.getIpaddress(), NetworkUtil.getHost()};
                 macAddresses = NetworkUtil.getLanDeviceMacAndIpAddresses(sudoPopupWindow.getSudo());
-
                 parseSmartSystemNetworkJsonData(sudoPopupWindow.getSudo());
                 sudoPopupWindow.voidSudo();
                 return null;
@@ -257,50 +275,100 @@ public class PadLandingController implements Initializable {
             disableUI();
         });
         task.setOnSucceeded(workerStateEvent -> {
-            gridpaneCenter.getChildren().remove(bar);
+            removeProgressBarFromVBoxBottom(bar, progressbarLabel);
             enableUI();
             // build host smart node visual
-            Circle hostNode = new Circle(150.0f, 67.5f, 50.0f);
+            Circle hostNode = new Circle(PeepingConstants.HOST_NODE_V, PeepingConstants.HOST_NODE_V1, PeepingConstants.HOST_NODE_V2);
             HostNodeImpl host = new HostNodeImpl(hostNode, vboxBottom, smartSystemNetwork, 1, 0, gridpaneCenter);
             gridpaneCenter.setGridLinesVisible(true);
             gridpaneCenter.add(host.getNode(), 0, 0);
+            gridpaneCenter.add(host.getHostNodeLabel(), 0, 0);
         });
         new Thread(task).start();
     }
 
+    /**
+     * Disables the build-network-button on Smart Pad Landing UI.
+     * @see Button#setDisable(boolean)
+     */
     private void disableBuildNetworkButton() {
         buildNetworkButton.setDisable(true);
     }
 
+    /**
+     * Enables the build-network-button on Smart Pad Landing UI.
+     * @see Button#setDisable(boolean)
+     */
     private void enableBuildNetworkButton() {
         buildNetworkButton.setDisable(false);
     }
 
+    /**
+     * Disables the json-snapshot-button on Smart Pad Landing UI.
+     * @see Button#setDisable(boolean)
+     */
     private void disableJsonSnapShotButton() {
         jsonSnapShotButton.setDisable(true);
     }
 
+    /**
+     * Enables the build-network-button on Smart Pad Landing UI.
+     * @see Button#setDisable(boolean)
+     */
     private void enableJsonSnapShotButton() {
         jsonSnapShotButton.setDisable(false);
     }
 
+    /**
+     * Disables the Center Gridpane on Smart Pad Landing UI.
+     * @see GridPane#setDisable(boolean)
+     */
     private void disableGridPaneCenter() {
         gridpaneCenter.setDisable(true);
     }
 
+    /**
+     * Enables the Center Gridpane on Smart Pad Landing UI.
+     * @see GridPane#setDisable(boolean)
+     */
     private void enableGridPaneCenter() {
         gridpaneCenter.setDisable(false);
     }
 
+    /**
+     * Disables the entire Smart Pad Builder UI and its child-nodes.
+     */
     private void disableUI() {
         disableGridPaneCenter();
         disableJsonSnapShotButton();
         disableBuildNetworkButton();
     }
 
+    /**
+     * Enables the entire Smart Pad Builder UI and its child-nodes.
+     */
     private void enableUI() {
         enableGridPaneCenter();
         enableJsonSnapShotButton();
         enableBuildNetworkButton();
+    }
+
+    private void setProgressBarInVBoxBottom(ProgressBar bar, Label progressBarLabel) {
+        vboxBottom.setAlignment(Pos.BASELINE_CENTER);
+        vboxBottom.getChildren().add(bar);
+        vboxBottom.getChildren().add(progressBarLabel);
+    }
+
+    private void removeProgressBarFromVBoxBottom(ProgressBar bar, Label progressBarLabel) {
+        vboxBottom.getChildren().remove(bar);
+        vboxBottom.getChildren().remove(progressBarLabel);
+        vboxBottom.setAlignment(Pos.TOP_LEFT);
+    }
+
+    private void setProgressLabelProperties(Label progressLabel) {
+        progressLabel.setText("initializing build...");
+        progressLabel.setTextFill(Color.web(PeepingConstants.HACKER_GREEN));
+        progressLabel.setFont(new Font(16.0f));
+        progressLabel.setPadding(new Insets(5.0f));
     }
 }

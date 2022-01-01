@@ -119,6 +119,7 @@ public final class PeepingConstants {
 
     // Node constants
     public static final String SMART_DEVICE_NODE_TYPE = "smartDeviceNodeType";
+    public static final String DEVICE = "Device";
     public static final String SMART_DEVICE_NODE_DETAILS = "smartDeviceNodeDetails";
     public static final String SMART_DEVICE_MAC_ADDRESS_DETAILS = "smartDeviceMacAddressDetails";
     public static final String SMART_DEVICE_REGION = "smartDeviceRegion";
@@ -174,6 +175,16 @@ public final class PeepingConstants {
 
     // ui renditions
     public static final String HACKER_GREEN = "#20c20e";
+    public static final String BLACK = "#000";
+    public static final float HOST_NODE_V = 150.0f;
+    public static final float HOST_NODE_V1 = 67.5f;
+    public static final float HOST_NODE_V2 = 50.0f;
+
+    public static final float NODE_DIVISOR = 1.5f;
+
+    public static final float DEVICE_NODE_V = HOST_NODE_V / NODE_DIVISOR;
+    public static final float DEVICE_NODE_V1 = HOST_NODE_V1 / NODE_DIVISOR;
+    public static final float DEVICE_NODE_V2 = HOST_NODE_V2 / NODE_DIVISOR;
 
     /**
      * Prevents native class from calling this constructor. The caller references constants using

@@ -1,6 +1,7 @@
 package com.smart.peepingbill.models.impl;
 
 import com.smart.peepingbill.models.HostNode;
+import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -9,16 +10,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HostNodeImpl implements HostNode, EventHandler<MouseEvent> {
 
     private final Circle node;
-    private Set<Label> hostNodeLabels;
+    private ArrayList<Label> hostNodeLabels;
     private final VBox vboxBottom;
     private final GridPane gridPane;
+    private final Label hostNodeLabel;
     private int row;
     private int column;
     private boolean isNetworkUiRendered;
@@ -29,19 +32,26 @@ public class HostNodeImpl implements HostNode, EventHandler<MouseEvent> {
                         int row, GridPane gridpane) {
         this.node = node;
         this.gridPane = gridpane;
+        this.hostNodeLabel = createHostNodeLabel();
         this.row = row;
         this.column = column;
-        this.hostNodeLabels = new HashSet<>();
+        this.hostNodeLabels = new ArrayList<>();
         this.isNetworkUiRendered = false;
         this.vboxBottom = vboxBottom;
         this.smartSystemNetwork = systemNetwork;
         this.node.setFill(Color.web(PeepingConstants.HACKER_GREEN));
         this.node.setOnMouseClicked(this);
+        this.hostNodeLabel.setOnMouseClicked(this);
     }
 
     @Override
     public Circle getNode() {
         return this.node;
+    }
+
+    @Override
+    public Label getHostNodeLabel() {
+        return hostNodeLabel;
     }
 
     @Override
@@ -89,13 +99,16 @@ public class HostNodeImpl implements HostNode, EventHandler<MouseEvent> {
         if (!getIsNetworkUiRendered()) {
             int size = smartSystemNetwork.getSmartSystemJSON().length() - 1;
             for (int i = 0; i < size; i++) {
-                Circle deviceNode = new Circle(75.0f, 33.75f, 25.0f);
+                Circle deviceNode = new Circle(PeepingConstants.DEVICE_NODE_V, PeepingConstants.DEVICE_NODE_V1,
+                        PeepingConstants.DEVICE_NODE_V2);
+
                 if (getColumn() == 4) {
                     setColumn(0);
                     incrementRow();
                 }
-                DeviceNodeImpl device = new DeviceNodeImpl(deviceNode, i, vboxBottom, smartSystemNetwork);
+                DeviceNodeImpl device = new DeviceNodeImpl(deviceNode, i, vboxBottom, gridPane, smartSystemNetwork);
                 this.gridPane.add(device.getNode(), getColumn(), getRow());
+                device.addLabelToDeviceNode(getColumn(), getRow());
                 incrementColumn();
             }
             setIsNetworkUiRendered(true);
@@ -109,10 +122,16 @@ public class HostNodeImpl implements HostNode, EventHandler<MouseEvent> {
         hostNodeLabels.forEach((label -> vboxBottom.getChildren().add(label)));
     }
 
-    private Set<Label> buildHostNodeLabels() {
-        return new HashSet<>(Set.of((new Label(smartSystemNetwork.getSmartSystemHostName())),
+    private ArrayList<Label> buildHostNodeLabels() {
+        return new ArrayList<>(List.of((new Label(smartSystemNetwork.getSmartSystemHostName())),
                 new Label(smartSystemNetwork.getSmartSystemHostMacAddress()),
                 new Label(smartSystemNetwork.getSmartSystemHostExternalIpaddress()),
                 new Label(smartSystemNetwork.getSmartSystemHostLocalIpaddress())));
+    }
+
+    private Label createHostNodeLabel() {
+        Label label = new Label(NetworkUtil.getHost());
+        label.setFont(new Font(16.0f));
+        return label;
     }
 }
