@@ -161,6 +161,9 @@ public final class PeepingConstants {
     public static final String NMAP_DEVICE_SCAN_FOR_OS = "sudo nmap -Pn -v -O";
     public static final String NMAP_CONTAINS_PORT_STATE_SERVICE = "port_state-service";
 
+    // tcpdump constants
+    public static final String TCPDUMP_WLO1_HOST_TRAFFIC_PREFIX = "sudo tcpdump -ni wlo1 host";
+
     // SnapShot file constants
     public static final String CODEX_SNAP_SHOT_DIRECTORY = "/CodexSnapShots";
     public static final String CODEX_SNAP_SHOT_JSON_DIRECTORY = "/JSONSnapShots";

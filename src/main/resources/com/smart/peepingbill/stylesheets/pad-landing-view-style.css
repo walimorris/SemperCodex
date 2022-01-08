@@ -5,9 +5,18 @@
     -fx-padding: 50px;
 }
 
-#vboxBottom {
+#vboxDeviceInfo {
     -fx-background-color: #000;
     -fx-border-color: #20c20e;
+    -fx-text-fill: #20c20e;
+    -fx-border-width: 3px;
+    -fx-padding: 100px;
+}
+
+#vboxDeviceTraffic {
+    -fx-background-color: #000;
+    -fx-border-color: #20c20e;
+    -fx-text-fill: #20c20e;
     -fx-border-width: 3px;
     -fx-padding: 100px;
 }

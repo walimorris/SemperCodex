@@ -127,40 +127,16 @@ public class NetworkUtil {
 
     /**
      * <p>
-     * Returns the network segment from the given ip-address. That is, the first two 8-bit parts
-     * of an ip-address containing four 8-bit parts.
-     * </p>
-     * @param ip ip-address
-     * @return   {@link String}
-     */
-    @NotNull
-    private static String getIPNetworkSegment(String ip) {
-        int count = 0, dotCount = 0;
-        StringBuilder partialIp = new StringBuilder();
-        char current = ip.charAt(count);
-        while (dotCount < 2) {
-            dotCount = current == '.' ? dotCount + 1 : dotCount;
-            if (dotCount == 2) {
-                break;
-            }
-            partialIp.append(current);
-            count++;
-            current = ip.charAt(count);
-        }
-        return partialIp.toString();
-    }
-
-    /**
-     * <p>
-     * Spawns process for given command and creates a {@link BufferedReader} to read in and
-     * process the returned response from given command.
+     * Spawns process for a given command and creates a {@link BufferedReader} to read in and
+     * process the returned response from given command. Assumes command is prefixed with sudo-
+     * privileged command and consumes the sudo-secret key.
      * </p>
      * @param cmd given command
      * @param key sudo pass
      * @return    {@link BufferedReader}
      * @see       #isInvalidKey(byte[], StringBuilder)
      */
-    private static BufferedReader spawnProcess(String cmd, String key) {
+    public static BufferedReader spawnProcess(String cmd, String key) {
         BufferedReader bufferedReader = null;
         try {
             Process process = Runtime.getRuntime().exec(cmd);
@@ -189,6 +165,31 @@ public class NetworkUtil {
             LOG.error("Error establishing BufferedReader for cmd process: {}", e.getMessage());
         }
         return bufferedReader;
+    }
+
+    /**
+     * <p>
+     * Returns the network segment from the given ip-address. That is, the first two 8-bit parts
+     * of an ip-address containing four 8-bit parts.
+     * </p>
+     * @param ip ip-address
+     * @return   {@link String}
+     */
+    @NotNull
+    private static String getIPNetworkSegment(String ip) {
+        int count = 0, dotCount = 0;
+        StringBuilder partialIp = new StringBuilder();
+        char current = ip.charAt(count);
+        while (dotCount < 2) {
+            dotCount = current == '.' ? dotCount + 1 : dotCount;
+            if (dotCount == 2) {
+                break;
+            }
+            partialIp.append(current);
+            count++;
+            current = ip.charAt(count);
+        }
+        return partialIp.toString();
     }
 
     /**

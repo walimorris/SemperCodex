@@ -3,7 +3,7 @@ package com.smart.peepingbill.models;
 import com.smart.peepingbill.models.impl.SmartSystemNetworkImpl;
 
 /**
- * Defines the interface for {@code com/smart/peepingbill/models/SnapShot.java}.
+ * Defines the interface for {@link com.smart.peepingbill.models.impl.SnapShotImpl}.
  */
 public interface SnapShot {
 

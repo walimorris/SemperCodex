@@ -6,7 +6,6 @@ import com.smart.peepingbill.util.NetworkUtil;
 import com.smart.peepingbill.util.constants.PeepingConstants;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,7 +18,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -59,7 +57,10 @@ public class PadLandingController implements Initializable {
     private VBox vboxLeft;
 
     @FXML
-    private VBox vboxBottom;
+    private VBox vboxDeviceInfo;
+
+    @FXML
+    private VBox vboxDeviceTraffic;
 
     @FXML
     private GridPane gridpaneCenter;
@@ -158,6 +159,10 @@ public class PadLandingController implements Initializable {
         return null;
     }
 
+    /**
+     * Get current scene.
+     * @return {@link Scene}
+     */
     @Nullable
     private Scene getCurrentScene() {
         if (currentScene != null) {
@@ -266,7 +271,7 @@ public class PadLandingController implements Initializable {
                 ipHostArray = new String[]{NetworkUtil.getIpaddress(), NetworkUtil.getHost()};
                 macAddresses = NetworkUtil.getLanDeviceMacAndIpAddresses(sudoPopupWindow.getSudo());
                 parseSmartSystemNetworkJsonData(sudoPopupWindow.getSudo());
-                sudoPopupWindow.voidSudo();
+//                sudoPopupWindow.voidSudo();
                 return null;
             }
         };
@@ -279,10 +284,12 @@ public class PadLandingController implements Initializable {
             enableUI();
             // build host smart node visual
             Circle hostNode = new Circle(PeepingConstants.HOST_NODE_V, PeepingConstants.HOST_NODE_V1, PeepingConstants.HOST_NODE_V2);
-            HostNodeImpl host = new HostNodeImpl(hostNode, vboxBottom, smartSystemNetwork, 1, 0, gridpaneCenter);
+            HostNodeImpl host = new HostNodeImpl(hostNode, sudoPopupWindow.getSudo(), vboxDeviceInfo, vboxDeviceTraffic, smartSystemNetwork, 1, 0, gridpaneCenter);
             gridpaneCenter.setGridLinesVisible(true);
             gridpaneCenter.add(host.getNode(), 0, 0);
             gridpaneCenter.add(host.getHostNodeLabel(), 0, 0);
+            isNetworkUiRendered = true;
+            sudoPopupWindow.voidSudo();
         });
         new Thread(task).start();
     }
@@ -353,18 +360,36 @@ public class PadLandingController implements Initializable {
         enableBuildNetworkButton();
     }
 
+    /**
+     * Renders {@link ProgressBar} and progress bar {@link Label} in the UI's bottom
+     * portion VBox.
+     *
+     * @param bar              {@link ProgressBar}
+     * @param progressBarLabel {@link Label}
+     */
     private void setProgressBarInVBoxBottom(ProgressBar bar, Label progressBarLabel) {
-        vboxBottom.setAlignment(Pos.BASELINE_CENTER);
-        vboxBottom.getChildren().add(bar);
-        vboxBottom.getChildren().add(progressBarLabel);
+        vboxDeviceInfo.setAlignment(Pos.BASELINE_CENTER);
+        vboxDeviceInfo.getChildren().add(bar);
+        vboxDeviceInfo.getChildren().add(progressBarLabel);
     }
 
+    /**
+     * Removes {@link ProgressBar} and progress bar {@link Label} from the UI's bottom
+     * portion VBox.
+     *
+     * @param bar              {@link ProgressBar}
+     * @param progressBarLabel {@link Label}
+     */
     private void removeProgressBarFromVBoxBottom(ProgressBar bar, Label progressBarLabel) {
-        vboxBottom.getChildren().remove(bar);
-        vboxBottom.getChildren().remove(progressBarLabel);
-        vboxBottom.setAlignment(Pos.TOP_LEFT);
+        vboxDeviceInfo.getChildren().remove(bar);
+        vboxDeviceInfo.getChildren().remove(progressBarLabel);
+        vboxDeviceInfo.setAlignment(Pos.TOP_LEFT);
     }
 
+    /**
+     * Set's various properties for a {@link Label} prioritized for a {@link ProgressBar}.
+     * @param progressLabel {@link Label}
+     */
     private void setProgressLabelProperties(Label progressLabel) {
         progressLabel.setText("initializing build...");
         progressLabel.setTextFill(Color.web(PeepingConstants.HACKER_GREEN));

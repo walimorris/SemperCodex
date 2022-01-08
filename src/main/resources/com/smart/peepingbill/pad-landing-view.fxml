@@ -18,10 +18,13 @@
             <Button fx:id="jsonSnapShotButton" text="JSON Snap Shot" onAction="#getJsonSnapShot"/>
         </VBox>
     </left>
+    <right>
+        <VBox fx:id="vboxDeviceInfo"/>
+    </right>
     <center>
         <GridPane fx:id="gridpaneCenter"/>
     </center>
     <bottom>
-        <VBox fx:id="vboxBottom"/>
+        <VBox fx:id="vboxDeviceTraffic"/>
     </bottom>
 </BorderPane>
