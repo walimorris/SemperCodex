@@ -112,3 +112,8 @@ The following is an example of your LAN and its devices' data represented as JSO
   }
 }
 ```
+***
+### SnapShots 
+SnapShots are a very simple way to save an instance of your system network and its JSON structure directly on to your 
+local file system. SnapShots are pretty printed to a .json file, easy to read, and even easier to save with a snapshot 
+button located in the main UI. Snapshots are saved to the <mark>/user/home/CodexSnapShots</mark> directory. 
